@@ -13,7 +13,8 @@ namespace DiasPrestados.Editor
     /// Fase 1 "Memoria desvanecida": crea/actualiza ForestAtmosphereDemo.unity a partir de ForestDemo.unity.
     /// ForestDemo.unity y Prototype.unity NO se modifican. No se tocan colliders, transforms de gameplay,
     /// PlayerController2D ni CameraFollow2D: solo sprites/colores, capas visuales, luz, partículas y viñeta.
-    /// Menú: Tools > Dias Prestados > Crear / actualizar Forest Atmosphere Demo
+    /// Menú de generación desactivado: la escena principal es ForestOrganicDemo.
+    /// Se conserva el código (helpers de atmósfera); no regenera escenas eliminadas.
     /// </summary>
     public static class ForestAtmosphereSceneBuilder
     {
@@ -36,77 +37,18 @@ namespace DiasPrestados.Editor
 
         static readonly Color GlobalLightColor = new Color(0.93f, 0.96f, 1f, 1f);
 
-        [MenuItem("Tools/Dias Prestados/Crear / actualizar Forest Atmosphere Demo")]
-        public static void CreateOrUpdateMenu()
-        {
-            CreateOrUpdate(interactive: true);
-        }
+        // Menú obsoleto (ForestAtmosphereDemo.unity eliminada).
 
         public static void CreateOrUpdate(bool interactive)
         {
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            Debug.LogWarning(
+                "[Días Prestados] Generación de ForestAtmosphereDemo desactivada. Usa Assets/Scenes/ForestOrganicDemo.unity.");
+            if (interactive && !Application.isBatchMode)
             {
-                throw new System.InvalidOperationException(
-                    "Sal de Play Mode antes de generar ForestAtmosphereDemo.");
-            }
-
-            if (!File.Exists(SourcePath))
-            {
-                throw new FileNotFoundException("Falta ForestDemo.unity", SourcePath);
-            }
-
-            bool showUi = interactive && !Application.isBatchMode;
-            try
-            {
-                if (showUi)
-                {
-                    EditorUtility.DisplayProgressBar("Días Prestados", "Generando arte atmosférico...", 0.2f);
-                }
-
-                ForestAtmosphereArtGenerator.EnsureAllSprites();
-
-                if (!File.Exists(ScenePath))
-                {
-                    if (!AssetDatabase.CopyAsset(SourcePath, ScenePath))
-                    {
-                        throw new IOException("No se pudo copiar ForestDemo.unity a ForestAtmosphereDemo.unity.");
-                    }
-
-                    AssetDatabase.Refresh();
-                }
-
-                if (!PrepareToOpenScene(showUi))
-                {
-                    return;
-                }
-
-                Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
-                ApplyAtmosphere(scene);
-
-                if (!EditorSceneManager.SaveScene(scene, ScenePath))
-                {
-                    throw new IOException("No se pudo guardar ForestAtmosphereDemo.unity.");
-                }
-
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-                Debug.Log("[Días Prestados] ForestAtmosphereDemo listo en " + ScenePath);
-
-                if (showUi)
-                {
-                    EditorUtility.DisplayDialog(
-                        "Días Prestados",
-                        "ForestAtmosphereDemo creada/actualizada.\n\nAbre: " + ScenePath +
-                        "\nForestDemo.unity no se ha modificado.",
-                        "Aceptar");
-                }
-            }
-            finally
-            {
-                if (showUi)
-                {
-                    EditorUtility.ClearProgressBar();
-                }
+                EditorUtility.DisplayDialog(
+                    "Días Prestados",
+                    "ForestAtmosphereDemo ya no forma parte del proyecto.\nAbre ForestOrganicDemo.unity.",
+                    "Aceptar");
             }
         }
 
@@ -898,15 +840,9 @@ namespace DiasPrestados.Editor
                 return;
             }
 
-            Debug.Log("[Días Prestados] Atmosphere auto-build...");
-            try
-            {
-                ForestAtmosphereSceneBuilder.CreateOrUpdate(interactive: false);
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError($"[Días Prestados] Atmosphere auto-build falló: {ex}");
-            }
+            // Obsoleto: ForestAtmosphereDemo.unity ya no existe. No regenerar.
+            Debug.LogWarning(
+                "[Días Prestados] Atmosphere auto-build desactivado. Usa Assets/Scenes/ForestOrganicDemo.unity.");
         }
 
         static void OnPlayModeChanged(PlayModeStateChange state)

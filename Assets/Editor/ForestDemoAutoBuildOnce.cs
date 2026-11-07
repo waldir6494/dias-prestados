@@ -26,22 +26,6 @@ namespace DiasPrestados.Editor
                 return;
             }
 
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
-            {
-                if (!waitingForEditMode)
-                {
-                    waitingForEditMode = true;
-                    EditorApplication.playModeStateChanged += OnPlayModeChanged;
-                    Debug.Log("[Días Prestados] Auto-build ForestDemo: saliendo de Play Mode...");
-                    EditorApplication.ExitPlaymode();
-                }
-
-                return;
-            }
-
-            waitingForEditMode = false;
-            EditorApplication.playModeStateChanged -= OnPlayModeChanged;
-
             try
             {
                 File.Delete(FlagPath);
@@ -51,15 +35,11 @@ namespace DiasPrestados.Editor
                 return;
             }
 
-            Debug.Log("[Días Prestados] Auto-build ForestDemo (legibilidad/sorting)…");
-            try
-            {
-                ForestDemoSceneBuilder.CreateOrUpdateForestDemo(interactive: false);
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError($"[Días Prestados] Auto-build ForestDemo falló: {ex}");
-            }
+            // Obsoleto: ForestDemo.unity ya no existe. No regenerar.
+            Debug.LogWarning(
+                "[Días Prestados] Auto-build ForestDemo desactivado. Usa Assets/Scenes/ForestOrganicDemo.unity.");
+            waitingForEditMode = false;
+            EditorApplication.playModeStateChanged -= OnPlayModeChanged;
         }
 
         static void OnPlayModeChanged(PlayModeStateChange state)

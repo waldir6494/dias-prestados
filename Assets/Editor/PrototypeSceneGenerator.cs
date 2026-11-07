@@ -10,8 +10,8 @@ using UnityEngine.SceneManagement;
 namespace DiasPrestados.Editor
 {
     /// <summary>
-    /// Genera el primer prototipo jugable: escenario, personaje, cámara, sprites y escena guardada.
-    /// Menú: Tools > Dias Prestados > Crear prototipo
+    /// Generador histórico del prototipo. Menú desactivado: la escena principal es ForestOrganicDemo.
+    /// Se conserva el código por si hace falta regenerar sprites de Assets/Art/Prototype.
     /// </summary>
     public static class PrototypeSceneGenerator
     {
@@ -28,93 +28,17 @@ namespace DiasPrestados.Editor
         const float GroundTopY = 0f;
         const float PlayerSpawnX = -16f;
 
-        [MenuItem("Tools/Dias Prestados/Crear prototipo")]
+        // Menú obsoleto (Prototype.unity eliminada). No reactivar sin restaurar la escena.
         public static void CreatePrototype()
         {
-            if (File.Exists(ScenePath) || AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath) != null)
+            Debug.LogWarning(
+                "[Días Prestados] Generación de Prototype desactivada. Usa Assets/Scenes/ForestOrganicDemo.unity.");
+            if (!Application.isBatchMode)
             {
-                if (Application.isBatchMode)
-                {
-                    Debug.Log("[Días Prestados] Prototype.unity ya existe. En batch mode se reemplaza.");
-                }
-                else
-                {
-                    bool replace = EditorUtility.DisplayDialog(
-                        "Días Prestados",
-                        "La escena Prototype.unity ya existe.\n\n¿Quieres reemplazarla?\nSampleScene no se modificará.",
-                        "Reemplazar",
-                        "Cancelar");
-
-                    if (!replace)
-                    {
-                        return;
-                    }
-                }
-            }
-
-            try
-            {
-                if (!Application.isBatchMode)
-                {
-                    EditorUtility.DisplayProgressBar("Días Prestados", "Preparando carpetas y sprites...", 0.1f);
-                }
-
-                EnsureFolders();
-                CreatePersistentSprites();
-
-                if (!Application.isBatchMode)
-                {
-                    EditorUtility.DisplayProgressBar("Días Prestados", "Construyendo escena...", 0.45f);
-                }
-
-                Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-                scene.name = "Prototype";
-
-                BuildPrototypeScene();
-
-                if (!Application.isBatchMode)
-                {
-                    EditorUtility.DisplayProgressBar("Días Prestados", "Guardando escena...", 0.85f);
-                }
-
-                Directory.CreateDirectory(Path.GetDirectoryName(ScenePath) ?? "Assets/Scenes");
-                bool saved = EditorSceneManager.SaveScene(scene, ScenePath);
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-
-                if (!saved)
-                {
-                    Debug.LogError("[Días Prestados] No se pudo guardar Prototype.unity.");
-                    if (!Application.isBatchMode)
-                    {
-                        EditorUtility.DisplayDialog("Días Prestados", "No se pudo guardar Prototype.unity.", "Aceptar");
-                    }
-
-                    return;
-                }
-
-                var sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath);
-                if (sceneAsset != null && !Application.isBatchMode)
-                {
-                    Selection.activeObject = sceneAsset;
-                    EditorGUIUtility.PingObject(sceneAsset);
-                }
-
-                Debug.Log($"[Días Prestados] Prototipo creado en {ScenePath}. Pulsa Play para probar (A/D o ←/→; salto ↑).");
-                if (!Application.isBatchMode)
-                {
-                    EditorUtility.DisplayDialog(
-                        "Días Prestados",
-                        "Prototipo creado.\n\nEscena: Assets/Scenes/Prototype.unity\nControles: A/D o ←/→; salto ↑.\n\nPulsa Play para jugar.",
-                        "Aceptar");
-                }
-            }
-            finally
-            {
-                if (!Application.isBatchMode)
-                {
-                    EditorUtility.ClearProgressBar();
-                }
+                EditorUtility.DisplayDialog(
+                    "Días Prestados",
+                    "Prototype ya no forma parte del proyecto.\nAbre ForestOrganicDemo.unity.",
+                    "Aceptar");
             }
         }
 

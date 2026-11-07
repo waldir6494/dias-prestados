@@ -11,66 +11,45 @@ Guía para agentes y desarrolladores que trabajen en este repositorio.
 - Plataforma objetivo actual: **Windows**
 - Idioma de código y comentarios de diseño: **C# / español** cuando aporte claridad
 
+## Escena principal (única)
+
+**`Assets/Scenes/ForestOrganicDemo.unity`**
+
+- Es la **única** escena de desarrollo y la escena inicial de Build (Windows).
+- Integrar nuevas funcionalidades **sobre esta escena**. No crear demos nuevas por feature.
+- Controles: **A/D** o ←/→; salto: **↑** (`Assets/Input/PrototypeControls.inputactions`).
+- Abrir: Project → `Assets/Scenes/ForestOrganicDemo`, o **Tools → Dias Prestados → Abrir Forest Organic Demo** (solo abre; **nunca** regenera).
+- Si falta el archivo: error claro; no hay bootstrap desde escenas antiguas (ya eliminadas).
+- Geometría de referencia del tramo: `Assets/Editor/ForestOrganicLayout.cs`.
+- Comprobación geométrica (Edit Mode): **Tools → Dias Prestados → Comprobar ruta Forest Organic**.
+- Colliders en Scene View: **Tools → Dias Prestados → Mostrar colliders del escenario**.
+
 ## Estado actual
 
-Base jugable + demo atmosférica de bosque:
-
-- Controlador 2D con Input System (`PlayerController2D`)
-- Cámara con seguimiento (`CameraFollow2D`)
-- Escena base: `Assets/Scenes/Prototype.unity`
-- Escena atmosférica: `Assets/Scenes/ForestDemo.unity` (parallax, atardecer, estación, luces URP 2D)
-- Arte provisional procedural (PNG persistentes en `Assets/Art`)
+- Controlador: `PlayerController2D` + Input System
+- Cámara: `CameraFollow2D`
+- Atmósfera "Memoria desvanecida", terreno orgánico, parallax, niebla, luces URP 2D
+- Arte provisional en `Assets/Art` (`ForestOrganic/`, `ForestAtmosphere/`, etc.)
 - **Aún no** hay puzles temporales, enemigos ni sistemas narrativos avanzados
-
-## Cómo generar / abrir escenas
-
-### Prototipo jugable
-
-1. **Tools → Dias Prestados → Crear prototipo**
-2. Abrir `Assets/Scenes/Prototype.unity`
-3. Play — controles: **A/D** o flechas ←/→; salto: **↑**
-
-### Forest Demo (bosque misterioso)
-
-1. Debe existir `Prototype.unity` (no se destruye).
-2. **Tools → Dias Prestados → Crear / actualizar Forest Demo**
-3. Si `ForestDemo` no existe: copia Prototype → ForestDemo y aplica atmósfera.
-4. Si ya existe: solo regenera nodos gestionados (`ForestVisuals`, estilo visual, luces cálidas, partículas). **No** sustituye el Player ni recrea colisiones desde cero.
-5. Abrir `Assets/Scenes/ForestDemo.unity` y pulsar Play.
-
-### Forest Atmosphere Demo (Fase 1 "Memoria desvanecida")
-
-1. Debe existir `ForestDemo.unity` (no se modifica).
-2. **Tools → Dias Prestados → Crear / actualizar Forest Atmosphere Demo**
-3. Copia ForestDemo → `ForestAtmosphereDemo.unity` y aplica paleta fría, niebla por capas, luz global clara, acentos cálidos (#E8A84A), motas suaves y viñeta mínima (`AtmosphereVignette`).
-4. No toca colliders, posiciones ni escalas de gameplay (los sprites nuevos conservan exactamente los bounds).
-5. Paleta: `#1B2733`, `#3A4A4C`, `#7C8A8A`, `#B9B3A0`, acento `#E8A84A` (ver `AtmospherePalette`).
-6. Código: `ForestAtmosphereArtGenerator.cs`, `ForestAtmosphereSceneBuilder.cs`, arte en `Assets/Art/ForestAtmosphere/`.
-
-### Forest Organic Demo (tramo de prueba)
-
-1. **Tools → Dias Prestados → Crear / actualizar Forest Organic Demo** (parte de `ForestAtmosphereDemo.unity`, que no se modifica).
-2. Abrir `Assets/Scenes/ForestOrganicDemo.unity`. Geometría única en `Assets/Editor/ForestOrganicLayout.cs` (sprites y colliders salen de ella).
-3. Comprobación geométrica en Edit Mode: **Tools → Dias Prestados → Comprobar ruta Forest Organic**.
 
 ## Estructura relevante
 
 ```
 Assets/
   Art/
-    Prototype/            # Sprites del prototipo
-    Forest/               # Sprites del bosque (cielo, montañas, árboles, estación…)
-  Editor/                 # Generadores de escena/arte
+    Prototype/            # Sprites compartidos (p. ej. jugador)
+    Forest/               # Capas / siluetas de bosque (legado, en uso visual)
+    ForestAtmosphere/     # Capas / paleta / motas usadas por la escena principal
+    ForestOrganic/        # Terreno, tronco, peñasco, pasarela…
+  Editor/                 # Herramientas (abrir escena, colliders, checks)
   Input/                  # PrototypeControls.inputactions
   Scripts/
     Camera/
-    Environment/          # ParallaxLayer, AmbientDustParticles
+    Environment/          # ParallaxLayer, AmbientDustParticles, AtmosphereVignette
     Player/
   Scenes/
-    Prototype.unity       # Base jugable — conservar
-    ForestDemo.unity      # Demo atmosférica — a partir de Prototype
-    SampleScene.unity     # Plantilla — no sobrescribir
-  Settings/               # URP / Input System plantilla
+    ForestOrganicDemo.unity   # ÚNICA escena
+  Settings/               # URP / Input System
 ```
 
 ## Limitaciones artísticas (provisional)
@@ -93,13 +72,12 @@ Assets/
 
 - **Solo** Input System moderno (`com.unity.inputsystem`).
 - No usar `Input.GetAxis` / `Input.GetKey` legacy.
-- Acciones del prototipo: `Assets/Input/PrototypeControls.inputactions`.
+- Acciones: `Assets/Input/PrototypeControls.inputactions`.
 
 ### Render / URP 2D
 
 - Mantener configuración URP 2D en `Assets/Settings/`.
-- Escenas 2D: `Light2D` global + cámara con `UniversalAdditionalCameraData`.
-- ForestDemo: ambiente global ligeramente frío + puntos cálidos (`Light2D` Point).
+- Escena 2D: `Light2D` global + cámara con `UniversalAdditionalCameraData`.
 
 ### Organización de código
 
@@ -109,17 +87,17 @@ Assets/
 - No dependencias de pago ni paquetes innecesarios.
 - No commits/pushes/merges salvo petición explícita del usuario.
 
-### Escenas y contenido generado
+### Escenas
 
-- **Nunca** sobrescribir `SampleScene.unity`.
-- Conservar `Prototype.unity` al crear demos derivadas.
-- Nodos regenerables deben tener nombre estable (`ForestVisuals`, `WarmLights`, `AmbientDust`, hijos `_ForestStyle*`).
-- Assets persistentes vía `AssetDatabase` / PNG / `EditorSceneManager.SaveScene`.
+- Solo `ForestOrganicDemo.unity` en `Assets/Scenes`.
+- **Nunca** regenerar ni sobrescribir la escena principal con generadores.
+- Menús históricos de Prototype / ForestDemo / ForestAtmosphere están desactivados.
+- Antes de cambios fuertes: backup manual fuera del repo o commit local (no hay carpeta `Scenes/Backups`).
 
 ## Prioridades de diseño (producto)
 
-1. Base jugable estable
-2. Narrativa visual y atmósfera ← (ForestDemo)
+1. Base jugable estable ← (ForestOrganicDemo)
+2. Narrativa visual y atmósfera
 3. Puzles temporales
 4. Sigilo y tensión
 5. Pulido de arte y audio
@@ -129,20 +107,13 @@ Assets/
 - Afirmar compilación/Play Mode sin verificarlo.
 - Commits no pedidos.
 - Sustituir Input System por legacy.
-- Escenas vacías o reemplazar el controlador del jugador sin necesidad.
+- Crear escenas nuevas por cada feature.
 - Descargas externas / assets de pago no solicitados.
 
 ## Pruebas mínimas
 
-### Prototype
-
-- Generación sin errores; Play: correr, 4 plataformas, desnivel, obstáculos.
-
-### ForestDemo
-
-- Abrir `ForestDemo.unity` (no Prototype).
-- Play: mismo control/fisica que Prototype.
-- Comprobar parallax al caminar, cielo atardecer, estación/raíles al fondo, luces cálidas, motas, que la decoración no empuje al jugador.
-- Legibilidad: suelo/plataformas (tapa clara), cajas de madera, rocas sólidas vs `FG_Rock_*` decorativas, arbustos de bajo contraste.
-- Depuración: **Tools → Dias Prestados → Mostrar colliders del escenario** (solo Scene View).
-- Backup previo a cambios fuertes: `Assets/Scenes/Backups/`.
+- Abrir `Assets/Scenes/ForestOrganicDemo.unity` (sin Missing Scripts).
+- Play: moverse, saltar (↑), recorrer loma → tronco → peñasco → pasarela.
+- Parallax, niebla, luces y motas intactos; decoración sin empujar al jugador.
+- File → Build Settings: solo `ForestOrganicDemo` habilitada.
+- Depuración: **Tools → Dias Prestados → Mostrar colliders del escenario**.

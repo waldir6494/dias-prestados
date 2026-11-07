@@ -19,7 +19,7 @@ namespace DiasPrestados.Editor
         const float RockWidthTolerance = 0.12f;
         const float SampleFractions = 5f;
 
-        [MenuItem("Tools/Dias Prestados/Diagnosticar colisiones Forest Demo")]
+        [MenuItem("Tools/Dias Prestados/Diagnosticar colisiones de la escena")]
         public static void DiagnoseFromMenu()
         {
             int issues = LogActiveSceneAndProbe();

@@ -9,9 +9,8 @@ using UnityEngine.SceneManagement;
 namespace DiasPrestados.Editor
 {
     /// <summary>
-    /// Crea/actualiza ForestDemo a partir de Prototype sin destruir Prototype.
-    /// Regenera ForestVisuals, la iluminación y el ajuste visual/físico de Environment.
-    /// Menú: Tools > Dias Prestados > Crear / actualizar Forest Demo
+    /// Generador histórico de ForestDemo. Menú desactivado: la escena principal es ForestOrganicDemo.
+    /// Se conservan las constantes OneWay* (tests / código compartido).
     /// </summary>
     public static class ForestDemoSceneBuilder
     {
@@ -31,130 +30,18 @@ namespace DiasPrestados.Editor
         public const float OneWaySideArc = 1f;
         public const bool OneWayGrouping = true;
 
-        [MenuItem("Tools/Dias Prestados/Crear / actualizar Forest Demo")]
-        public static void CreateOrUpdateForestDemoMenu()
-        {
-            CreateOrUpdateForestDemo(interactive: true);
-        }
+        // Menú obsoleto (ForestDemo.unity eliminada).
 
         public static void CreateOrUpdateForestDemo(bool interactive = true)
         {
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            Debug.LogWarning(
+                "[Días Prestados] Generación de ForestDemo desactivada. Usa Assets/Scenes/ForestOrganicDemo.unity.");
+            if (interactive && !Application.isBatchMode)
             {
-                throw new System.InvalidOperationException(
-                    "Sal de Play Mode antes de generar ForestDemo (EditorSceneManager.OpenScene no funciona en Play).");
-            }
-
-            if (!File.Exists(PrototypePath) && AssetDatabase.LoadAssetAtPath<SceneAsset>(PrototypePath) == null)
-            {
-                if (interactive && !Application.isBatchMode)
-                {
-                    EditorUtility.DisplayDialog(
-                        "Días Prestados",
-                        "No existe Prototype.unity.\nGenera primero el prototipo con Tools > Dias Prestados > Crear prototipo.",
-                        "Aceptar");
-                }
-
-                throw new FileNotFoundException("Falta Prototype.unity", PrototypePath);
-            }
-
-            bool showUi = interactive && !Application.isBatchMode;
-
-            try
-            {
-                if (showUi)
-                {
-                    EditorUtility.DisplayProgressBar("Días Prestados", "Generando arte del bosque...", 0.15f);
-                }
-
-                EnsureSortingLayersExist();
-                ForestArtGenerator.EnsureAllSprites();
-
-                bool forestExists = File.Exists(ForestDemoPath) ||
-                                    AssetDatabase.LoadAssetAtPath<SceneAsset>(ForestDemoPath) != null;
-
-                if (!forestExists)
-                {
-                    if (showUi)
-                    {
-                        EditorUtility.DisplayProgressBar("Días Prestados", "Copiando Prototype → ForestDemo...", 0.35f);
-                    }
-
-                    if (!AssetDatabase.CopyAsset(PrototypePath, ForestDemoPath))
-                    {
-                        throw new IOException("No se pudo copiar Prototype.unity a ForestDemo.unity.");
-                    }
-
-                    AssetDatabase.Refresh();
-                }
-                else if (showUi)
-                {
-                    bool update = EditorUtility.DisplayDialog(
-                        "Días Prestados",
-                        "ForestDemo.unity ya existe.\n\nSe actualizarán la iluminación, las plataformas " +
-                        "unidireccionales y los visuales gestionados (" + VisualsRootName + ").\n" +
-                        "No se tocará Prototype.unity ni el movimiento del jugador.\n\n¿Continuar?",
-                        "Actualizar",
-                        "Cancelar");
-                    if (!update)
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    Debug.Log("[Días Prestados] ForestDemo existe: se actualizan iluminación, colisiones y visuales.");
-                }
-
-                if (showUi)
-                {
-                    EditorUtility.DisplayProgressBar("Días Prestados", "Aplicando atmósfera de bosque...", 0.6f);
-                }
-
-                Scene scene = OpenForestDemoWithoutPrompt(showUi);
-                ApplyForestAtmosphere(scene);
-
-                bool saved = EditorSceneManager.SaveScene(scene, ForestDemoPath);
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-
-                if (!saved)
-                {
-                    throw new IOException("No se pudo guardar ForestDemo.unity.");
-                }
-
-                var sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(ForestDemoPath);
-                if (sceneAsset != null && showUi)
-                {
-                    Selection.activeObject = sceneAsset;
-                    EditorGUIUtility.PingObject(sceneAsset);
-                }
-
-                Debug.Log("[Días Prestados] ForestDemo listo en Assets/Scenes/ForestDemo.unity");
-                try
-                {
-                    ForestCollisionDiagnostics.LogActiveSceneAndProbe();
-                }
-                catch (System.Exception ex)
-                {
-                    Debug.LogError($"[Días Prestados] El diagnóstico posterior al guardado falló: {ex}");
-                }
-
-                if (showUi)
-                {
-                    EditorUtility.DisplayDialog(
-                        "Días Prestados",
-                        "Forest Demo actualizado.\n\nAbre: Assets/Scenes/ForestDemo.unity\n" +
-                        "Prototype.unity se conserva intacto.\n\nPulsa Play y recorre el bosque.",
-                        "Aceptar");
-                }
-            }
-            finally
-            {
-                if (showUi)
-                {
-                    EditorUtility.ClearProgressBar();
-                }
+                EditorUtility.DisplayDialog(
+                    "Días Prestados",
+                    "ForestDemo ya no forma parte del proyecto.\nAbre ForestOrganicDemo.unity.",
+                    "Aceptar");
             }
         }
 
