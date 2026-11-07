@@ -3,9 +3,11 @@ using UnityEngine;
 namespace DiasPrestados
 {
     /// <summary>
-    /// Animación sobria del PNG aprobado del protagonista (sprite integrado).
-    /// No usa marioneta de piezas. Prioriza fidelidad visual y pies plantados
-    /// (pivot inferior): idle/walk sin rebote vertical del root.
+    /// INTERIM (no es animación por fotogramas).
+    /// El diseño PNG está aprobado; faltan frames Walk/Idle/Run/Jump/Fall/Landing
+    /// — ver Docs/Development/PROGRESS.md (BLOQUEADO). Este componente solo aplica
+    /// lean/squash leve sobre un sprite único y se sustituirá por Animator+clips
+    /// cuando existan fotogramas válidos. No es marioneta.
     /// </summary>
     [DisallowMultipleComponent]
     public class PlayerProtagonistAnimator : MonoBehaviour

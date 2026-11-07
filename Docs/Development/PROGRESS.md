@@ -1,66 +1,69 @@
 # Progress — Animaciones del protagonista
 
-## Estado actual (revisión tras feedback de David)
+## Estado: BLOQUEADO (fotogramas)
 
-La marioneta articulada de piezas rígidas **fue rechazada** y **retirada** del Player.
+Diseño visual del PNG **aprobado** — no se rediseña.
 
-Solución vigente: **PNG aprobado** del protagonista (recorte + pivot en suelas) + animación **sobria** del sprite integrado (`PlayerProtagonistAnimator`). No es un cycle frame-by-frame artístico completo.
+El problema pendiente es el **deslizamiento**: hace falta animación 2D **por fotogramas** (Idle/Walk/Run/Jump/Fall/Landing).  
+**No** hay marioneta. **No** hay clips `.anim` / Animator Controller. **No** hay spritesheet de producción.
 
 Rama/PR: `cursor/animaciones-protagonista-2f38` / [#1](https://github.com/davidmartirio/dias-prestados/pull/1)  
-Base: `feature/prototipo-jugable` (sin merge a `main`).
+Base: `feature/prototipo-jugable` — **sin merge**.
 
-## Cambios de esta revisión
+## Inspección
 
-| Antes (rechazado) | Ahora |
-|-------------------|--------|
-| Piezas procedurales tipo marioneta | Sprite único derivado del PNG aprobado |
-| Walk con piernas rígidas | Lean + squash suave, **sin bob vertical** del root |
-| Pies flotando / mal apoyo | Pivot en suelas, altura ≈ 1.72 (cápsula 1.7), `Visual` en y=-0.85 |
-| Ocultaba el PNG | `SpriteRenderer` del `Visual` activo con `ProtagonistApproved.png` |
+| Recurso | Hallazgo |
+|---------|----------|
+| Visual en escena | `ProtagonistApproved.png` (recorte del perfil aprobado, pivot suelas, h≈1.72) |
+| PNG original | `Assets/Art/Characters/Protagonist/DiasPrestados_Protagonista_Perfil_PNG.png` — **1 pose estática** |
+| Frames de animación en `Assets/` | **Ninguno** (no `.anim`, no `.controller`, no carpeta de frames Walk/Idle/…) |
+| `PlayerProtagonistAnimator` | Transform sobrio (lean/squash) sobre **un solo** sprite — **no** es animación por fotogramas; David lo identifica como sprite estático que se desliza |
+| `Docs/.../DiasPrestados_Hoja_Animaciones.png` | Referencia con etiquetas/fondo; **no** spritesheet importable |
+| `Docs/.../04_protagonista_12_anos.png` | Concepto con strips; poses/estilo no homologados al PNG aprobado |
+| Partes `Parts/` / `Resources/ProtagonistParts/` | Marioneta rechazada; no usar |
 
-## Archivos clave
+### Intento de producir Walk 8
 
-- `Assets/Art/Characters/Protagonist/ProtagonistApproved.png` — PNG aprobado recortado, pivot en pies, PPU ≈ 285
-- `Assets/Scripts/Player/PlayerProtagonistAnimator.cs` — Idle / Walk / Jump / Fall / Landing sobrios
-- `Assets/Scripts/Player/PlayerController2D.cs` — giro con `flipX` (no pelea con squash)
-- `Assets/Scenes/ForestOrganicDemo.unity` — cableado mínimo del visual
-- Eliminado del Player: `PlayerArticulatedAnimator` (script quitado)
-- Las partes en `Parts/` y `Resources/ProtagonistParts/` **se conservan** pero **no se usan**
+Se intentó generar un strip Walk 8 con el PNG aprobado como referencia. Resultado: **8 copias idénticas de una sola pose** (sin ciclo de piernas/brazos). **No cumple** “ciclo completo” ni “NO copias del mismo sprite”. Descartado; no se integró.
 
-## Prioridades cubiertas
+## Sprites que faltan (bloqueo exacto)
 
-1. Aspecto fiel al PNG aprobado — sí (mismo arte, no siluetas placeholder)
-2. Contacto con el suelo — pivot/altura/offset alineados a la cápsula; sin traslación Y en suelo
-3. Coherencia con el PNG — sí
-4. Naturalidad básica — lean/respiración/squash; **no** walk cycle pintado
+Lienzo uniforme, alpha limpio, mismo diseño/proporciones/ropa que `ProtagonistApproved`, pivote/pies alineados, piernas y brazos **visibles y distintos** entre frames:
 
-## Validaciones
+1. **Walk — 8 frames** (prioridad #1; ciclo completo) — **FALTA / BLOQUEA el resto**
+2. **Run — 8 frames** — pendiente (solo tras Walk válido)
+3. **Idle — ~4 frames** — pendiente
+4. **Jump — 2–4 frames** — pendiente
+5. **Fall — 1–2 frames** — pendiente
+6. **Landing — 2–3 frames** — pendiente
 
-- Estáticas: escena apunta al nuevo GUID; física/collider/GroundCheck no tocados.
-- Unity Play Mode: **no ejecutado aquí** (Editor ausente en el entorno).
+Sin el ítem 1 no se montan Animator Controller, clips ni sync de zancada.
 
-## Checklist exacta en Unity 6.6
+## Qué hay en el repo ahora (no es la solución de fotogramas)
 
-1. Abrir el proyecto (`6000.6.8f1`) y dejar importar `ProtagonistApproved.png`.
-2. Abrir `Assets/Scenes/ForestOrganicDemo.unity` (**no** regenerar).
-3. `Player` → componente `PlayerProtagonistAnimator` (no debe haber `PlayerArticulatedAnimator`).
-4. Hijo `Visual`:
-   - `SpriteRenderer` **enabled**
-   - Sprite = `ProtagonistApproved`
-   - Sorting Layer `Gameplay`, order ≥ 20
-   - Local Position y = `-0.85`
-   - Sin hijo `ArticulatedRig`
-5. Play Mode — Idle: respiración leve; pies fijos en el suelo (no flotan).
-6. Walk (A/D): lean/squash suave; **sin** rebote vertical raro; se ve el niño del PNG, no piezas.
-7. Salto/caída/aterrizaje: poses sobrias; al aterrizar squash breve.
-8. Giro izq/der: `flipX`; collider sin escalas negativas.
-9. Confirmar que movimiento/salto/gravedad se sienten iguales.
-10. Comparar visualmente con `Docs/ArtDirection/References/DiasPrestados_Protagonista_Perfil_PNG.png`.
+- Visual fiel al PNG aprobado + pivot/altura/giro `flipX`
+- `PlayerProtagonistAnimator` = interim transform; **no** sustituye Walk por frames
+- Física / collider / GroundCheck / cámara **sin cambios**
 
-## Limitaciones artísticas restantes (honestas)
+## Integración Animator
 
-- **No** hay spritesheet Idle/Walk/Jump pintado frame a frame.
-- El walk sigue siendo el **mismo dibujo** con deformación transform (lean/squash); no mueve piernas dibujadas.
-- La bufanda/mochila no tienen sim secundaria independiente.
-- Para walk/jump definitivos hace falta arte de producción (o extracción cuidadosa y retocada de la hoja de concepto, hoy no homologada).
-- Ajuste fino de pivot/PPU puede requerir un pase visual en Editor sobre el terreno real del bosque.
+**No hecha** (no hay frames válidos). Orden obligatorio cuando existan assets:
+
+1. Importar Walk 8 → clips + controller → validar stride vs `linearVelocity.x`
+2. Luego Run / Idle / aéreos solo con recursos reales
+
+## Play Mode
+
+**No ejecutado**: Unity Editor ausente en este entorno.
+
+## Checklist Unity (cuando existan frames Walk 8)
+
+1. Importar frames con pivote en pies, PPU coherente, alpha OK  
+2. Crear `Walk` clip (loop) + Animator Controller  
+3. Cablear en `Visual` sin regenerar escena; leer `IsGrounded` / velocidad existentes  
+4. Play: piernas/brazos se mueven; sin desliz de pies; giro solo visual  
+5. No alterar Rigidbody2D / CapsuleCollider2D / GroundCheck / salto / gravedad / CameraFollow2D  
+
+## Limitación artística (honesta)
+
+Este entorno **no puede** pintar un ciclo Walk 8 consistente con el PNG aprobado a calidad indie. Hace falta entrega de arte (o pipeline artístico humano) con los frames listados arriba.

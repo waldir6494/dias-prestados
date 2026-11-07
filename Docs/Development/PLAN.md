@@ -1,66 +1,59 @@
 # Plan — Animaciones del protagonista
 
-## Contexto (análisis)
+## Contexto
 
-- Escena activa: `Assets/Scenes/ForestOrganicDemo.unity`.
-- El `Player` usa `PlayerController2D` + `Rigidbody2D` + `CapsuleCollider2D` (1.7 × 0.55).
-- Jerarquía visual actual:
-  - `Visual` (activo): sprite estático `DiasPrestados_Protagonista_Perfil_PNG` (perfil, PPU 214, pivot inferior).
-  - `Visual_Legacy` (inactivo): silueta procedural antigua.
-- El giro horizontal ya existe vía `SpriteRenderer.flipX` en el primer renderer hijo.
-- Referencias en `Docs/ArtDirection/References/` (perfil + hoja de animaciones) **no** son spritesheets importables: proporciones/poses inconsistentes entre frames.
-- No hay `Animator`, clips ni controller en el proyecto.
-- Unity Editor **no** está disponible en este entorno cloud → no se puede generar clips `.anim` desde el Editor ni validar Play Mode aquí.
+- Diseño visual del PNG de perfil: **APROBADO** (no rediseñar).
+- Escena: `Assets/Scenes/ForestOrganicDemo.unity`.
+- Problema actual: el personaje se **desliza** porque solo hay un fotograma estático (más un interim de lean/squash).
+- Objetivo: animación 2D **por fotogramas** (indie cuidado). Prohibido: marioneta de piezas; sprite único deslizándose como “solución final”.
 
-## Objetivo de animación
+## Inspección (hecho)
 
-Estados jugables del protagonista:
+- Un solo sprite jugable aprobado: `ProtagonistApproved.png`.
+- No existen frames Idle/Walk/Run/Jump/Fall/Landing en `Assets/`.
+- No hay Animator Controller ni clips.
+- Hojas en `Docs/ArtDirection/References/` = referencia; **no** spritesheet válido (etiquetas, fondos, inconsistencias).
+- Intento de generación automática de Walk 8: falló (frames idénticos). Ver `PROGRESS.md`.
 
-| Estado   | Disparo |
-|----------|---------|
-| Idle     | En suelo, \|vx\| bajo |
-| Walk/Run | En suelo, \|vx\| alto |
-| Jump     | En aire, vy > umbral |
-| Fall     | En aire, vy ≤ umbral |
-| Landing  | Transición aire → suelo (corta) |
-| Facing   | Escala X del root visual (no tocar colisión) |
+## Estado del plan: BLOQUEADO en recursos
 
-Diseño visual objetivo: niño ~12 años, cabello oscuro, chaqueta azul-grisácea, bufanda roja, mochila, botas.
+Hasta tener **Walk 8** válidos no se implementa la integración Animator.
 
-## Solución mínima elegida (revisada tras rechazo de la marioneta)
+### Entrega de arte requerida
 
-**Sprite integrado = PNG aprobado** + animación sobria por transform:
+| Set | Frames | Notas |
+|-----|--------|-------|
+| Walk | 8 | Prioridad 1; piernas/brazos visibles; ciclo completo |
+| Run | 8 | Solo tras Walk |
+| Idle | ~4 | Solo tras Walk |
+| Jump | 2–4 | Solo tras Walk |
+| Fall | 1–2 | Solo tras Walk |
+| Landing | 2–3 | Solo tras Walk |
 
-1. `ProtagonistApproved.png`: recorte del PNG de perfil aprobado, pivot en suelas, altura mundo ≈ 1.72 (cápsula 1.7).
-2. `PlayerProtagonistAnimator`: Idle / Walk / Jump / Fall / Landing con respiración, lean y squash.
-   - En suelo **no** hay traslación Y del root (evita flotar / root motion visual raro).
-   - Se elimina la marioneta de piezas rígidas del Player.
-3. `PlayerController2D`: giro con `SpriteRenderer.flipX` (sin pelear con el squash).
-4. Integración mínima en `ForestOrganicDemo.unity`. **No** regenerar la escena.
+Criterios: mismo niño ~12 (pelo oscuro, chaqueta azul-gris, bufanda roja, mochila, botas); alpha; lienzo uniforme; pivote/pies alineados; **no** duplicar el mismo pose con offset.
 
-### Por qué no marioneta / no spritesheet completo
+## Integración (cuando haya frames)
 
-- La marioneta procedural fue rechazada (feo, pies mal, no parece el PNG).
-- La hoja artística no es un spritesheet válido para importar tal cual.
-- Sin frames pintados, priorizamos **fidelidad al PNG** sobre “animación de piezas”.
+1. Import sprites (Single o Multiple), pivot pies, PPU alineado a altura ~1.72 / Visual y=-0.85.
+2. Clips Unity + Animator Controller; parámetros tipicos: `Speed`, `Grounded`, `VerticalVelocity`, `Landing`.
+3. Sync: stride rate ∝ `|Rigidbody2D.linearVelocity.x|`; sin root motion físico.
+4. Transiciones Idle ↔ Walk/Run ↔ Jump/Fall ↔ Landing.
+5. Giro solo en visual (`flipX` / escala del Visual); no tocar física.
+6. Escena: cableado mínimo en `Player`/`Visual`; **no** regenerar.
 
-## Arte definitivo pendiente
+### No tocar
 
-Walk/Jump frame-a-frame coherentes con el perfil aprobado (o retocado desde la hoja de concepto). La animación actual es transform sobria sobre el dibujo integrado.
+Rigidbody2D, CapsuleCollider2D, GroundCheck, salto, gravedad, CameraFollow2D.
 
-## Restricciones respetadas
+## Interim actual (no cuenta como animación por frames)
 
-- No nuevas escenas; no regenerar `ForestOrganicDemo`.
-- No alterar movimiento, gravedad, salto, `Rigidbody2D`, `CapsuleCollider2D` ni cámara.
-- No destruir recursos existentes (`Visual_Legacy`, PNG de perfil).
-- Solo protagonista.
-- Controles teclado e Input System intactos; Sorting Layer `Gameplay` en renderers del rig.
+- Visual = PNG aprobado (pivot/altura).
+- `PlayerProtagonistAnimator` = lean/squash temporal.
+- Se sustituye o desactiva al integrar el Animator con Walk 8.
 
-## Orden de implementación
+## Orden de trabajo restante
 
-1. Análisis (este documento).
-2. Recursos visuales de partes.
-3. Scripts de animación + exposición de estado.
-4. Cableado en `ForestOrganicDemo`.
-5. Validación estática disponible + checklist manual Unity.
-6. `PROGRESS.md` con resultado y limitaciones.
+1. **Arte:** Walk 8 → validación técnica en Unity.  
+2. Arte Run / Idle / aéreos.  
+3. Clips + Controller + sync.  
+4. Play Mode checklist.
