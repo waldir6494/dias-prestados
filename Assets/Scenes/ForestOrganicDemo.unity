@@ -2430,6 +2430,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2108456702}
   - component: {fileID: 2108456703}
+  - component: {fileID: 2108456704}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -2447,7 +2448,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0.85, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.76, y: 0.76, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1540022717}
@@ -2501,17 +2502,39 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 20
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 1fe1f9727ac995a4eae3df119a5ce2f6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 091609ba9e7a6bf7f0608204a4c84223, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.7196262, y: 2.2990654}
+  m_Size: {x: 2.666667, y: 3.333333}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!95 &2108456704
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108456701}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 224087e6e7748fdb18ae55207af328aa, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &676161083
 GameObject:
   m_ObjectHideFlags: 0
@@ -9126,6 +9149,7 @@ GameObject:
   - component: {fileID: 1540022720}
   - component: {fileID: 1540022719}
   - component: {fileID: 1540022718}
+  - component: {fileID: 1540022721}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -9246,6 +9270,28 @@ Rigidbody2D:
   m_SleepingMode: 0
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &1540022721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1540022716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8f31c0e2b7d4e9f6c5a1d0b8e7f6a45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DiasPrestados.PlayerProtagonistAnimator
+  visualRoot: {fileID: 2108456702}
+  visualRenderer: {fileID: 2108456703}
+  animator: {fileID: 2108456704}
+  controller: {fileID: 1540022718}
+  body: {fileID: 1540022720}
+  walkSpeedThreshold: 0.35
+  referenceWalkSpeed: 3.5
+  minAnimSpeed: 0.55
+  maxAnimSpeed: 1.6
+  visualScale: 0.76
 --- !u!1 &1540657611
 GameObject:
   m_ObjectHideFlags: 0

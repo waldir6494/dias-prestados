@@ -38,6 +38,7 @@ namespace DiasPrestados
 
         Rigidbody2D rb;
         Collider2D bodyCollider;
+        Transform visualRoot;
         SpriteRenderer visualRenderer;
         InputActionMap playerMap;
         InputAction moveAction;
@@ -51,12 +52,15 @@ namespace DiasPrestados
         float baseGravityScale;
 
         public bool IsGrounded { get; private set; }
+        public float MoveInput => moveInput;
+        public bool FacingRight => facingRight;
+        public Vector2 Velocity => rb != null ? rb.linearVelocity : Vector2.zero;
 
         void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
             bodyCollider = GetComponent<Collider2D>();
-            visualRenderer = GetComponentInChildren<SpriteRenderer>();
+            ResolveVisualRoot();
 
             rb.freezeRotation = true;
             rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
@@ -66,6 +70,22 @@ namespace DiasPrestados
 
             ResolveGroundCheck();
             BindInputActions();
+        }
+
+        void ResolveVisualRoot()
+        {
+            visualRoot = transform.Find("Visual");
+            if (visualRoot != null)
+            {
+                visualRenderer = visualRoot.GetComponent<SpriteRenderer>();
+                return;
+            }
+
+            visualRenderer = GetComponentInChildren<SpriteRenderer>();
+            if (visualRenderer != null)
+            {
+                visualRoot = visualRenderer.transform;
+            }
         }
 
         void OnEnable()
@@ -293,7 +313,7 @@ namespace DiasPrestados
 
         void SetFacing(float direction)
         {
-            // Voltear solo el sprite evita escalas negativas en el Rigidbody2D/Collider2D.
+            // flipX en el sprite: no toca Rigidbody/Collider y no pelea con el squash del animador.
             if (visualRenderer != null)
             {
                 visualRenderer.flipX = direction < 0f;
