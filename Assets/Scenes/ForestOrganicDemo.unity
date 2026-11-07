@@ -2501,12 +2501,12 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 20
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 1fe1f9727ac995a4eae3df119a5ce2f6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 667bd1d3d37e67c173fff1e17ba8d2cd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.7196262, y: 2.2990654}
+  m_Size: {x: 0.5370612, y: 1.72}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -9256,30 +9256,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 1540022716}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0cd45c199c7005f374714881c4560263, type: 3}
+  m_Script: {fileID: 11500000, guid: a8f31c0e2b7d4e9f6c5a1d0b8e7f6a45, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DiasPrestados.PlayerArticulatedAnimator
+  m_EditorClassIdentifier: Assembly-CSharp::DiasPrestados.PlayerProtagonistAnimator
   visualRoot: {fileID: 2108456702}
+  visualRenderer: {fileID: 2108456703}
+  approvedSprite: {fileID: 21300000, guid: 667bd1d3d37e67c173fff1e17ba8d2cd, type: 3}
   controller: {fileID: 1540022718}
   body: {fileID: 1540022720}
   walkSpeedThreshold: 0.35
-  jumpVelocityThreshold: 0.6
-  fallVelocityThreshold: -0.15
-  landingDuration: 0.18
-  walkCycleSpeed: 9.5
-  legSwingDegrees: 28
-  armSwingDegrees: 22
-  torsoBobDegrees: 3.5
-  headBobDegrees: 2.5
-  idleBreathSpeed: 2.2
-  idleBreathDegrees: 2
-  jumpArmDegrees: -28
-  jumpLegDegrees: -12
-  fallArmDegrees: 18
-  fallLegDegrees: 22
-  landingSquashDegrees: 16
-  sortingLayerName: Gameplay
-  sortingOrderBase: 20
+  jumpVelocityThreshold: 0.55
+  landingDuration: 0.16
+  idleBreathSpeed: 1.6
+  idleBreathScale: 0.012
+  walkCycleSpeed: 7.2
+  walkLeanDegrees: 3.2
+  walkSquash: 0.018
+  walkScarfSwayDegrees: 1.4
+  jumpStretch: 0.04
+  jumpLeanDegrees: -5
+  fallLeanDegrees: 4.5
+  fallSquash: 0.02
+  landingSquash: 0.06
 --- !u!1 &1540657611
 GameObject:
   m_ObjectHideFlags: 0

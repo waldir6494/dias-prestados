@@ -27,29 +27,26 @@ Estados jugables del protagonista:
 
 Diseño visual objetivo: niño ~12 años, cabello oscuro, chaqueta azul-grisácea, bufanda roja, mochila, botas.
 
-## Solución mínima elegida
+## Solución mínima elegida (revisada tras rechazo de la marioneta)
 
-**Rig articulado 2D por código** (no frame-by-frame artístico):
+**Sprite integrado = PNG aprobado** + animación sobria por transform:
 
-1. Partes PNG procedurales con la paleta del diseño (head, torso, scarf, backpack, arm, leg, boot), persistentes en `Assets/Art/Characters/Protagonist/Parts/`.
-2. Componente `PlayerArticulatedAnimator` que:
-   - Monta el rig bajo `Visual` en runtime (si aún no existe).
-   - Desactiva el `SpriteRenderer` monolítico de `Visual` (el asset se conserva).
-   - Anima rotaciones locales de extremidades según velocidad / suelo / aterrizaje.
-3. Extensión mínima de `PlayerController2D`:
-   - Exponer lectura de input horizontal y velocidad (sin cambiar física).
-   - Voltear el transform `Visual` con `localScale.x` (compatible con jerarquía articulada).
-4. Integración en `ForestOrganicDemo.unity`: añadir el componente al `Player` existente. **No** regenerar la escena.
+1. `ProtagonistApproved.png`: recorte del PNG de perfil aprobado, pivot en suelas, altura mundo ≈ 1.72 (cápsula 1.7).
+2. `PlayerProtagonistAnimator`: Idle / Walk / Jump / Fall / Landing con respiración, lean y squash.
+   - En suelo **no** hay traslación Y del root (evita flotar / root motion visual raro).
+   - Se elimina la marioneta de piezas rígidas del Player.
+3. `PlayerController2D`: giro con `SpriteRenderer.flipX` (sin pelear con el squash).
+4. Integración mínima en `ForestOrganicDemo.unity`. **No** regenerar la escena.
 
-### Por qué no Animator + spritesheet
+### Por qué no marioneta / no spritesheet completo
 
-- La hoja artística no es un spritesheet válido.
-- Sin Unity Editor no se pueden crear/validar `.controller` / clips de forma fiable.
-- El rig por código produce movimiento **real** de piezas (no un sprite estático con bobbing).
+- La marioneta procedural fue rechazada (feo, pies mal, no parece el PNG).
+- La hoja artística no es un spritesheet válido para importar tal cual.
+- Sin frames pintados, priorizamos **fidelidad al PNG** sobre “animación de piezas”.
 
 ## Arte definitivo pendiente
 
-Los PNG de partes son **placeholders funcionales** alineados a la paleta. El arte final (frames o partes pintadas consistentes a partir de `04_protagonista_12_anos` / perfil) queda documentado como pendiente de dirección artística.
+Walk/Jump frame-a-frame coherentes con el perfil aprobado (o retocado desde la hoja de concepto). La animación actual es transform sobria sobre el dibujo integrado.
 
 ## Restricciones respetadas
 

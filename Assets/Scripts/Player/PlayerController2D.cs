@@ -313,16 +313,7 @@ namespace DiasPrestados
 
         void SetFacing(float direction)
         {
-            // Voltear solo el root visual evita escalas negativas en Rigidbody2D/Collider2D
-            // y mantiene coherente un rig articulado jerárquico.
-            if (visualRoot != null)
-            {
-                Vector3 scale = visualRoot.localScale;
-                scale.x = Mathf.Abs(scale.x) * (direction < 0f ? -1f : 1f);
-                visualRoot.localScale = scale;
-                return;
-            }
-
+            // flipX en el sprite: no toca Rigidbody/Collider y no pelea con el squash del animador.
             if (visualRenderer != null)
             {
                 visualRenderer.flipX = direction < 0f;

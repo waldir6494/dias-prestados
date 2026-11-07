@@ -1,57 +1,66 @@
 # Progress — Animaciones del protagonista
 
-## Estado
+## Estado actual (revisión tras feedback de David)
 
-Implementación **completa a nivel de código y recursos** en rama `cursor/animaciones-protagonista-2f38` (base `feature/prototipo-jugable` @ `0f4a8f1`).
+La marioneta articulada de piezas rígidas **fue rechazada** y **retirada** del Player.
 
-Tipo de animación entregada: **rig articulado 2D por código** (piezas que rotan). No es un spritesheet frame-by-frame artístico. No es un sprite monolítico con bobbing.
+Solución vigente: **PNG aprobado** del protagonista (recorte + pivot en suelas) + animación **sobria** del sprite integrado (`PlayerProtagonistAnimator`). No es un cycle frame-by-frame artístico completo.
 
-## Tareas
+Rama/PR: `cursor/animaciones-protagonista-2f38` / [#1](https://github.com/davidmartirio/dias-prestados/pull/1)  
+Base: `feature/prototipo-jugable` (sin merge a `main`).
 
-| # | Tarea | Estado |
-|---|-------|--------|
-| 1 | Analizar personaje y sistema actual | Hecho |
-| 2 | Diseñar solución mínima (`PLAN.md`) | Hecho |
-| 3 | Preparar recursos visuales (partes PNG) | Hecho |
-| 4 | Implementar animaciones | Hecho |
-| 5 | Integrar en `ForestOrganicDemo` | Hecho |
-| 6 | Validaciones técnicas disponibles | Hecho (estáticas; sin Unity) |
-| 7 | Documentar resultado y pruebas manuales | Hecho (este archivo) |
+## Cambios de esta revisión
 
-## Qué se cambió
+| Antes (rechazado) | Ahora |
+|-------------------|--------|
+| Piezas procedurales tipo marioneta | Sprite único derivado del PNG aprobado |
+| Walk con piernas rígidas | Lean + squash suave, **sin bob vertical** del root |
+| Pies flotando / mal apoyo | Pivot en suelas, altura ≈ 1.72 (cápsula 1.7), `Visual` en y=-0.85 |
+| Ocultaba el PNG | `SpriteRenderer` del `Visual` activo con `ProtagonistApproved.png` |
 
-- `PlayerArticulatedAnimator`: monta `ArticulatedRig` bajo `Visual`, desactiva el `SpriteRenderer` estático (el PNG de perfil **se conserva**), anima Idle / Walk / Jump / Fall / Landing.
-- `PlayerController2D`: propiedades de lectura (`MoveInput`, `FacingRight`, `Velocity`); giro por `localScale.x` del `Visual` (sin tocar física).
-- Partes en `Assets/Art/Characters/Protagonist/Parts/` + carga runtime vía `Assets/Resources/ProtagonistParts/`.
-- Escena `ForestOrganicDemo.unity`: componente añadido al `Player` existente (sin regenerar).
+## Archivos clave
 
-## Arte definitivo pendiente
+- `Assets/Art/Characters/Protagonist/ProtagonistApproved.png` — PNG aprobado recortado, pivot en pies, PPU ≈ 285
+- `Assets/Scripts/Player/PlayerProtagonistAnimator.cs` — Idle / Walk / Jump / Fall / Landing sobrios
+- `Assets/Scripts/Player/PlayerController2D.cs` — giro con `flipX` (no pelea con squash)
+- `Assets/Scenes/ForestOrganicDemo.unity` — cableado mínimo del visual
+- Eliminado del Player: `PlayerArticulatedAnimator` (script quitado)
+- Las partes en `Parts/` y `Resources/ProtagonistParts/` **se conservan** pero **no se usan**
 
-Las partes son **placeholders procedurales** con paleta del diseño (cabello oscuro, chaqueta azul-gris, bufanda roja, mochila, botas). Sustituir por partes/frames pintados consistentes a partir de `Docs/ArtDirection/References/` cuando haya arte de producción.
+## Prioridades cubiertas
 
-## Validaciones hechas aquí
+1. Aspecto fiel al PNG aprobado — sí (mismo arte, no siluetas placeholder)
+2. Contacto con el suelo — pivot/altura/offset alineados a la cápsula; sin traslación Y en suelo
+3. Coherencia con el PNG — sí
+4. Naturalidad básica — lean/respiración/squash; **no** walk cycle pintado
 
-- Cableado YAML de escena: GUID del script, refs a `Visual` / controller / Rigidbody2D.
-- Diff: no se modificaron valores de `moveSpeed`, `jumpForce`, gravedad, collider ni cámara.
-- `SampleScene` intacta.
-- **Unity Editor no está instalado** en este entorno → no hay compilación Unity ni prueba visual en Play Mode.
+## Validaciones
 
-## Checklist manual en Unity 6.6 (pendiente)
+- Estáticas: escena apunta al nuevo GUID; física/collider/GroundCheck no tocados.
+- Unity Play Mode: **no ejecutado aquí** (Editor ausente en el entorno).
 
-1. Abrir proyecto en Unity `6000.6.8f1` y esperar import de `Resources/ProtagonistParts`.
-2. Abrir `Assets/Scenes/ForestOrganicDemo.unity` (no regenerar).
-3. Seleccionar `Player`: debe tener `PlayerArticulatedAnimator` habilitado.
-4. Play Mode:
-   - Idle: respiración / balanceo leve de torso y bufanda.
-   - A/D o flechas: ciclo de caminata con piernas y brazos opuestos.
-   - Espacio: pose de Jump al subir; Fall al bajar; Landing breve al tocar suelo.
-   - Giro izquierda/derecha: el rig completo se espeja (no el collider).
-5. Confirmar Sorting Layer `Gameplay` en las piezas.
-6. Confirmar que movimiento/salto se sienten igual que antes.
-7. Cerrar/reabrir: partes y escena siguen presentes; `Visual_Legacy` y PNG de perfil intactos.
+## Checklist exacta en Unity 6.6
 
-## Limitaciones honestas
+1. Abrir el proyecto (`6000.6.8f1`) y dejar importar `ProtagonistApproved.png`.
+2. Abrir `Assets/Scenes/ForestOrganicDemo.unity` (**no** regenerar).
+3. `Player` → componente `PlayerProtagonistAnimator` (no debe haber `PlayerArticulatedAnimator`).
+4. Hijo `Visual`:
+   - `SpriteRenderer` **enabled**
+   - Sprite = `ProtagonistApproved`
+   - Sorting Layer `Gameplay`, order ≥ 20
+   - Local Position y = `-0.85`
+   - Sin hijo `ArticulatedRig`
+5. Play Mode — Idle: respiración leve; pies fijos en el suelo (no flotan).
+6. Walk (A/D): lean/squash suave; **sin** rebote vertical raro; se ve el niño del PNG, no piezas.
+7. Salto/caída/aterrizaje: poses sobrias; al aterrizar squash breve.
+8. Giro izq/der: `flipX`; collider sin escalas negativas.
+9. Confirmar que movimiento/salto/gravedad se sienten iguales.
+10. Comparar visualmente con `Docs/ArtDirection/References/DiasPrestados_Protagonista_Perfil_PNG.png`.
 
-- Sin prueba visual ejecutada en esta máquina.
-- El look no sustituye el concepto art del perfil; es jugable/funcional.
-- Ajuste fino de pivotes/escala puede requerir un pase en Editor tras ver el personaje en contexto.
+## Limitaciones artísticas restantes (honestas)
+
+- **No** hay spritesheet Idle/Walk/Jump pintado frame a frame.
+- El walk sigue siendo el **mismo dibujo** con deformación transform (lean/squash); no mueve piernas dibujadas.
+- La bufanda/mochila no tienen sim secundaria independiente.
+- Para walk/jump definitivos hace falta arte de producción (o extracción cuidadosa y retocada de la hoja de concepto, hoy no homologada).
+- Ajuste fino de pivot/PPU puede requerir un pase visual en Editor sobre el terreno real del bosque.
