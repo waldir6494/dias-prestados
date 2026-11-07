@@ -11,7 +11,16 @@ Guía para agentes y desarrolladores que trabajen en este repositorio.
 - Plataforma objetivo actual: **Windows**
 - Idioma de código y comentarios de diseño: **C# / español** cuando aporte claridad
 
-## Escena principal (única)
+## Escena de la demo (Hito 1+)
+
+**`Assets/Scenes/DiasPrestadosDemo.unity`** — escena independiente de la demo controlada por hitos (ver `Docs/DEMO_MASTER_PLAN.md`, `DEMO_PROGRESS.md`, `DEMO_DECISIONS.md`).
+
+- Abrir: **Tools → Dias Prestados → Demo → Abrir DiasPrestadosDemo**. Controles: A/D o ←/→, ↑/Espacio salto, E interactuar.
+- Se construye con **Demo → Construir escena Hito 1** (sobrescribe solo esta escena) y **Generar arte del Hito 1**; autotest en **Demo → Autotest Hito 1 (Play Mode)**.
+- Código: `Scripts/Companions`, `Scripts/Interaction`, `Scripts/UI`, `Scripts/Testing`; editor: `Assets/Editor/Demo`.
+- No avanzar de hito sin aprobación explícita del usuario.
+
+## Escena principal anterior (ForestOrganicDemo)
 
 **`Assets/Scenes/ForestOrganicDemo.unity`**
 

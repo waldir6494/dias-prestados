@@ -14,9 +14,14 @@ namespace DiasPrestados
         [SerializeField] Vector2 minBounds = new Vector2(-16f, -1f);
         [SerializeField] Vector2 maxBounds = new Vector2(16f, 8f);
         [SerializeField] bool useBounds = true;
+        [Tooltip("Adelanto horizontal en la dirección de movimiento (0 = desactivado).")]
+        [SerializeField] float lookAheadDistance = 0f;
+        [SerializeField] float lookAheadSpeed = 2.5f;
 
         Camera cam;
         Vector3 velocity;
+        Rigidbody2D targetBody;
+        float lookAhead;
 
         void Awake()
         {
@@ -31,8 +36,20 @@ namespace DiasPrestados
                 return;
             }
 
+            if (lookAheadDistance > 0f)
+            {
+                if (targetBody == null)
+                {
+                    targetBody = target.GetComponent<Rigidbody2D>();
+                }
+
+                float vx = targetBody != null ? targetBody.linearVelocity.x : 0f;
+                float wanted = Mathf.Abs(vx) > 0.5f ? Mathf.Sign(vx) * lookAheadDistance : 0f;
+                lookAhead = Mathf.MoveTowards(lookAhead, wanted, lookAheadSpeed * Time.deltaTime);
+            }
+
             Vector3 desired = new Vector3(
-                target.position.x + offset.x,
+                target.position.x + offset.x + lookAhead,
                 target.position.y + offset.y,
                 transform.position.z);
 

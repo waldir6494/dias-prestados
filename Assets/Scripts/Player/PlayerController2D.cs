@@ -30,6 +30,10 @@ namespace DiasPrestados
         [SerializeField] LayerMask groundLayers = ~0;
         [SerializeField] float groundedSkin = 0.02f;
 
+        [Header("Pendientes")]
+        [Tooltip("Con colliders sin fricción, evita que el personaje resbale por pendientes cuando está parado.")]
+        [SerializeField] bool holdOnSlopesWhenIdle = false;
+
         [Header("Input")]
         [SerializeField] InputActionAsset inputActions;
         [SerializeField] string actionMapName = "Player";
@@ -273,6 +277,13 @@ namespace DiasPrestados
 
             float newX = Mathf.MoveTowards(currentX, targetSpeed, accel * Time.fixedDeltaTime);
             rb.linearVelocity = new Vector2(newX, rb.linearVelocity.y);
+
+            if (holdOnSlopesWhenIdle && IsGrounded && moveInput == 0f
+                && Mathf.Abs(newX) < 0.05f && rb.linearVelocity.y <= 0.5f)
+            {
+                rb.linearVelocity = Vector2.zero;
+                rb.gravityScale = 0f;
+            }
         }
 
         void ApplyVariableGravity()
