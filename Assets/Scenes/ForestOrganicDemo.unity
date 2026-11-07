@@ -2430,6 +2430,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2108456702}
   - component: {fileID: 2108456703}
+  - component: {fileID: 2108456704}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -2512,6 +2513,28 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!95 &2108456704
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108456701}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 224087e6e7748fdb18ae55207af328aa, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &676161083
 GameObject:
   m_ObjectHideFlags: 0
@@ -9261,23 +9284,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DiasPrestados.PlayerProtagonistAnimator
   visualRoot: {fileID: 2108456702}
   visualRenderer: {fileID: 2108456703}
-  approvedSprite: {fileID: 21300000, guid: 667bd1d3d37e67c173fff1e17ba8d2cd, type: 3}
+  animator: {fileID: 2108456704}
   controller: {fileID: 1540022718}
   body: {fileID: 1540022720}
   walkSpeedThreshold: 0.35
-  jumpVelocityThreshold: 0.55
-  landingDuration: 0.16
-  idleBreathSpeed: 1.6
-  idleBreathScale: 0.012
-  walkCycleSpeed: 7.2
-  walkLeanDegrees: 3.2
-  walkSquash: 0.018
-  walkScarfSwayDegrees: 1.4
-  jumpStretch: 0.04
-  jumpLeanDegrees: -5
-  fallLeanDegrees: 4.5
-  fallSquash: 0.02
-  landingSquash: 0.06
+  referenceWalkSpeed: 3.5
+  minAnimSpeed: 0.55
+  maxAnimSpeed: 1.6
+  idleVisualScale: 1
+  walkVisualScale: 0.76
 --- !u!1 &1540657611
 GameObject:
   m_ObjectHideFlags: 0
