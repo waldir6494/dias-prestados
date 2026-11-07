@@ -13,37 +13,56 @@ Guía para agentes y desarrolladores que trabajen en este repositorio.
 
 ## Estado actual
 
-Base jugable de prototipo:
+Base jugable + demo atmosférica de bosque:
 
-- Controlador 2D con Input System
-- Escena generable `Assets/Scenes/Prototype.unity`
-- Arte provisional procedural (sprites PNG persistentes)
+- Controlador 2D con Input System (`PlayerController2D`)
+- Cámara con seguimiento (`CameraFollow2D`)
+- Escena base: `Assets/Scenes/Prototype.unity`
+- Escena atmosférica: `Assets/Scenes/ForestDemo.unity` (parallax, atardecer, estación, luces URP 2D)
+- Arte provisional procedural (PNG persistentes en `Assets/Art`)
 - **Aún no** hay puzles temporales, enemigos ni sistemas narrativos avanzados
 
-## Cómo generar el prototipo
+## Cómo generar / abrir escenas
 
-1. Abrir el proyecto en Unity 6.6.
-2. Menú: **Tools → Dias Prestados → Crear prototipo**.
-3. Si `Prototype.unity` ya existe, confirmar el reemplazo (`SampleScene` no se toca).
-4. Abrir `Assets/Scenes/Prototype.unity` (el generador la deja abierta/seleccionada).
-5. Pulsar **Play**.
-6. Controles: **A/D** o **flechas** para mover, **Espacio** para saltar.
+### Prototipo jugable
+
+1. **Tools → Dias Prestados → Crear prototipo**
+2. Abrir `Assets/Scenes/Prototype.unity`
+3. Play — controles: **A/D** o flechas + **Espacio**
+
+### Forest Demo (bosque misterioso)
+
+1. Debe existir `Prototype.unity` (no se destruye).
+2. **Tools → Dias Prestados → Crear / actualizar Forest Demo**
+3. Si `ForestDemo` no existe: copia Prototype → ForestDemo y aplica atmósfera.
+4. Si ya existe: solo regenera nodos gestionados (`ForestVisuals`, estilo visual, luces cálidas, partículas). **No** sustituye el Player ni recrea colisiones desde cero.
+5. Abrir `Assets/Scenes/ForestDemo.unity` y pulsar Play.
 
 ## Estructura relevante
 
 ```
 Assets/
-  Art/Prototype/          # Sprites generados (persistentes)
-  Editor/                 # Herramientas de editor (solo Editor)
-  Input/                  # Input Actions del prototipo
+  Art/
+    Prototype/            # Sprites del prototipo
+    Forest/               # Sprites del bosque (cielo, montañas, árboles, estación…)
+  Editor/                 # Generadores de escena/arte
+  Input/                  # PrototypeControls.inputactions
   Scripts/
-    Camera/               # Seguimiento de cámara
-    Player/               # Controlador del personaje
+    Camera/
+    Environment/          # ParallaxLayer, AmbientDustParticles
+    Player/
   Scenes/
-    Prototype.unity       # Escena jugable generada
-    SampleScene.unity     # Escena plantilla — no sobrescribir
+    Prototype.unity       # Base jugable — conservar
+    ForestDemo.unity      # Demo atmosférica — a partir de Prototype
+    SampleScene.unity     # Plantilla — no sobrescribir
   Settings/               # URP / Input System plantilla
 ```
+
+## Limitaciones artísticas (provisional)
+
+- Sprites generados por código (siluetas de baja resolución, sin animación).
+- No son arte final: sirven para tono, composición, parallax e iluminación.
+- Sustituibles más adelante por assets de producción manteniendo sorting layers / factores de parallax.
 
 ## Convenciones técnicas
 
@@ -53,57 +72,59 @@ Assets/
 - Preferir APIs Unity 6 renombradas (`linearDamping`, etc.) cuando existan.
 - Personajes dinámicos: `FreezeRotation`, `CollisionDetectionMode2D.Continuous`, interpolación activada.
 - Detección de suelo fiable (OverlapBox + coyote time + jump buffer).
+- Decoración/fondos: **sin Collider2D** que interfiera con el jugador.
 
 ### Input
 
 - **Solo** Input System moderno (`com.unity.inputsystem`).
 - No usar `Input.GetAxis` / `Input.GetKey` legacy.
 - Acciones del prototipo: `Assets/Input/PrototypeControls.inputactions`.
-- El proyecto usa `activeInputHandler: Input System Package` (sin legacy).
 
 ### Render / URP 2D
 
-- Mantener configuración URP 2D existente en `Assets/Settings/`.
-- Escenas 2D deben incluir `Light2D` global y cámara con `UniversalAdditionalCameraData`.
-- No romper ni sustituir el pipeline sin necesidad explícita.
+- Mantener configuración URP 2D en `Assets/Settings/`.
+- Escenas 2D: `Light2D` global + cámara con `UniversalAdditionalCameraData`.
+- ForestDemo: ambiente global ligeramente frío + puntos cálidos (`Light2D` Point).
 
 ### Organización de código
 
 - Runtime: `Assets/Scripts/...`
 - Editor: `Assets/Editor/...`
-- Namespace raíz: `DiasPrestados` (editor: `DiasPrestados.Editor`)
-- No añadir dependencias de pago ni paquetes innecesarios.
-- No modificar archivos ajenos al objetivo de la tarea.
-- Conservar `.meta` existentes; dejar que Unity genere los de archivos nuevos.
+- Namespace: `DiasPrestados` / `DiasPrestados.Editor`
+- No dependencias de pago ni paquetes innecesarios.
+- No commits/pushes/merges salvo petición explícita del usuario.
 
 ### Escenas y contenido generado
 
-- **Nunca** sobrescribir `SampleScene.unity` como parte de herramientas internas.
-- Si un generador puede reemplazar `Prototype.unity`, pedir confirmación.
-- Los assets creados por herramientas deben persistir en disco (`AssetDatabase`, PNG, escenas guardadas con `EditorSceneManager`).
+- **Nunca** sobrescribir `SampleScene.unity`.
+- Conservar `Prototype.unity` al crear demos derivadas.
+- Nodos regenerables deben tener nombre estable (`ForestVisuals`, `WarmLights`, `AmbientDust`, hijos `_ForestStyle*`).
+- Assets persistentes vía `AssetDatabase` / PNG / `EditorSceneManager.SaveScene`.
 
 ## Prioridades de diseño (producto)
 
-1. Base jugable estable (movimiento, cámara, escenario).
-2. Narrativa visual y atmósfera.
-3. Puzles temporales / mecánica de “días prestados”.
-4. Sigilo y tensión.
-5. Pulido de arte y audio.
-
-No implementar sistemas futuros (puzles temporales, enemigos, UI narrativa completa) hasta que la base pedida esté sólida.
+1. Base jugable estable
+2. Narrativa visual y atmósfera ← (ForestDemo)
+3. Puzles temporales
+4. Sigilo y tensión
+5. Pulido de arte y audio
 
 ## Qué evitar
 
-- Afirmar que Unity compiló o que Play Mode funciona sin haberlo verificado.
-- Commits no pedidos por el usuario.
-- Refactors amplios no solicitados.
-- Sustituir Input System por Input legacy.
-- Introducir assets externos de pago o SDKs no solicitados.
+- Afirmar compilación/Play Mode sin verificarlo.
+- Commits no pedidos.
+- Sustituir Input System por legacy.
+- Escenas vacías o reemplazar el controlador del jugador sin necesidad.
+- Descargas externas / assets de pago no solicitados.
 
-## Pruebas mínimas recomendadas tras cambios de prototipo
+## Pruebas mínimas
 
-- Menú de generación ejecuta sin errores en Console.
-- Escena guarda en `Assets/Scenes/Prototype.unity`.
-- Play Mode: correr, saltar a las 4 plataformas, subir el desnivel, superar obstáculos.
-- Cámara sigue al jugador y respeta límites horizontales.
-- Cerrar/reabrir Unity: sprites y escena siguen presentes.
+### Prototype
+
+- Generación sin errores; Play: correr, 4 plataformas, desnivel, obstáculos.
+
+### ForestDemo
+
+- Abrir `ForestDemo.unity` (no Prototype).
+- Play: mismo control/fisica que Prototype.
+- Comprobar parallax al caminar, cielo atardecer, estación/raíles al fondo, luces cálidas, motas, que la decoración no empuje al jugador.
