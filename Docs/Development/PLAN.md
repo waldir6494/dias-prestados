@@ -15,9 +15,10 @@
 - Hojas en `Docs/ArtDirection/References/` = referencia; **no** spritesheet válido (etiquetas, fondos, inconsistencias).
 - Intento de generación automática de Walk 8: falló (frames idénticos). Ver `PROGRESS.md`.
 
-## Estado del plan: BLOQUEADO en recursos
+## Estado del plan: BLOQUEADO — Walk 8 no están en el repo
 
-Hasta tener **Walk 8** válidos no se implementa la integración Animator.
+David indicó PNG en `Assets/Art/Characters/Protagonist/Walk/`, pero **no aparecen** en local ni en `origin/feature/prototipo-jugable` / rama PR (verificado).  
+Hasta que esos 8 archivos estén pusheados/sincronizados no se implementa Animator ni `Player_Walk.anim`.
 
 ### Entrega de arte requerida
 

@@ -1,69 +1,44 @@
 # Progress — Animaciones del protagonista
 
-## Estado: BLOQUEADO (fotogramas)
+## Estado: BLOQUEADO — faltan los 8 PNG Walk en el repo/workspace
 
-Diseño visual del PNG **aprobado** — no se rediseña.
+David indicó que añadió 8 PNG en `Assets/Art/Characters/Protagonist/Walk/`.  
+**En esta máquina / remotos GitHub esa carpeta no existe.**
 
-El problema pendiente es el **deslizamiento**: hace falta animación 2D **por fotogramas** (Idle/Walk/Run/Jump/Fall/Landing).  
-**No** hay marioneta. **No** hay clips `.anim` / Animator Controller. **No** hay spritesheet de producción.
+Comprobado (2026-11-07):
 
-Rama/PR: `cursor/animaciones-protagonista-2f38` / [#1](https://github.com/davidmartirio/dias-prestados/pull/1)  
-Base: `feature/prototipo-jugable` — **sin merge**.
+| Fuente | Resultado |
+|--------|-----------|
+| Working tree local | No hay `Assets/Art/Characters/Protagonist/Walk/` |
+| `origin/feature/prototipo-jugable` (`0f4a8f1`) | Sin paths Walk |
+| `origin/cursor/animaciones-protagonista-2f38` (`884c85f`) | Sin paths Walk |
+| API GitHub contents de `…/Protagonist/Walk` | 404 |
 
-## Inspección
+Merge de `feature/prototipo-jugable` en la rama de trabajo: **ya estaba al día** (base `0f4a8f1`); nada nuevo que integrar; `ForestOrganicDemo` no se tocó.
 
-| Recurso | Hallazgo |
-|---------|----------|
-| Visual en escena | `ProtagonistApproved.png` (recorte del perfil aprobado, pivot suelas, h≈1.72) |
-| PNG original | `Assets/Art/Characters/Protagonist/DiasPrestados_Protagonista_Perfil_PNG.png` — **1 pose estática** |
-| Frames de animación en `Assets/` | **Ninguno** (no `.anim`, no `.controller`, no carpeta de frames Walk/Idle/…) |
-| `PlayerProtagonistAnimator` | Transform sobrio (lean/squash) sobre **un solo** sprite — **no** es animación por fotogramas; David lo identifica como sprite estático que se desliza |
-| `Docs/.../DiasPrestados_Hoja_Animaciones.png` | Referencia con etiquetas/fondo; **no** spritesheet importable |
-| `Docs/.../04_protagonista_12_anos.png` | Concepto con strips; poses/estilo no homologados al PNG aprobado |
-| Partes `Parts/` / `Resources/ProtagonistParts/` | Marioneta rechazada; no usar |
+Sin los PNG **no** se puede: validar distinct+alpha, pivotes, PPU~48, `Player_Walk.anim`, estado Walk del Animator, ni sync por velocidad.
 
-### Intento de producir Walk 8
+## Qué hace falta empujar / sincronizar
 
-Se intentó generar un strip Walk 8 con el PNG aprobado como referencia. Resultado: **8 copias idénticas de una sola pose** (sin ciclo de piernas/brazos). **No cumple** “ciclo completo” ni “NO copias del mismo sprite”. Descartado; no se integró.
+Ruta esperada: `Assets/Art/Characters/Protagonist/Walk/`  
+Idealmente 8 archivos PNG distintos (p. ej. `walk_01.png` … `walk_08.png`) + `.meta` si Unity ya los importó en local.
 
-## Sprites que faltan (bloqueo exacto)
+Cuando estén en `feature/prototipo-jugable` o en esta rama, el siguiente paso (solo Walk) será:
 
-Lienzo uniforme, alpha limpio, mismo diseño/proporciones/ropa que `ProtagonistApproved`, pivote/pies alineados, piernas y brazos **visibles y distintos** entre frames:
+1. Validar 8 PNG distintos + alpha  
+2. Pivote pies / import PPU ~48  
+3. `Player_Walk.anim` 10–12 FPS  
+4. Animator: estado Walk; Idle = sprite actual hasta mejor arte  
+5. Activar Walk por `|linearVelocity.x|` real; sin root motion  
+6. No tocar física / collider / GroundCheck / cámara  
+7. Documentar inconsistencias de dibujo  
 
-1. **Walk — 8 frames** (prioridad #1; ciclo completo) — **FALTA / BLOQUEA el resto**
-2. **Run — 8 frames** — pendiente (solo tras Walk válido)
-3. **Idle — ~4 frames** — pendiente
-4. **Jump — 2–4 frames** — pendiente
-5. **Fall — 1–2 frames** — pendiente
-6. **Landing — 2–3 frames** — pendiente
+## Interim actual (sin cambios en este turno de integración)
 
-Sin el ítem 1 no se montan Animator Controller, clips ni sync de zancada.
-
-## Qué hay en el repo ahora (no es la solución de fotogramas)
-
-- Visual fiel al PNG aprobado + pivot/altura/giro `flipX`
-- `PlayerProtagonistAnimator` = interim transform; **no** sustituye Walk por frames
-- Física / collider / GroundCheck / cámara **sin cambios**
-
-## Integración Animator
-
-**No hecha** (no hay frames válidos). Orden obligatorio cuando existan assets:
-
-1. Importar Walk 8 → clips + controller → validar stride vs `linearVelocity.x`
-2. Luego Run / Idle / aéreos solo con recursos reales
+- Visual: `ProtagonistApproved.png`  
+- `PlayerProtagonistAnimator`: lean/squash temporal (no fotogramas)  
+- PR [#1](https://github.com/davidmartirio/dias-prestados/pull/1) — sin merge  
 
 ## Play Mode
 
-**No ejecutado**: Unity Editor ausente en este entorno.
-
-## Checklist Unity (cuando existan frames Walk 8)
-
-1. Importar frames con pivote en pies, PPU coherente, alpha OK  
-2. Crear `Walk` clip (loop) + Animator Controller  
-3. Cablear en `Visual` sin regenerar escena; leer `IsGrounded` / velocidad existentes  
-4. Play: piernas/brazos se mueven; sin desliz de pies; giro solo visual  
-5. No alterar Rigidbody2D / CapsuleCollider2D / GroundCheck / salto / gravedad / CameraFollow2D  
-
-## Limitación artística (honesta)
-
-Este entorno **no puede** pintar un ciclo Walk 8 consistente con el PNG aprobado a calidad indie. Hace falta entrega de arte (o pipeline artístico humano) con los frames listados arriba.
+No aplicable hasta tener frames. Unity Editor sigue ausente aquí.
