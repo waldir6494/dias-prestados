@@ -9126,6 +9126,7 @@ GameObject:
   - component: {fileID: 1540022720}
   - component: {fileID: 1540022719}
   - component: {fileID: 1540022718}
+  - component: {fileID: 1540022721}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -9246,6 +9247,39 @@ Rigidbody2D:
   m_SleepingMode: 0
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &1540022721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1540022716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd45c199c7005f374714881c4560263, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DiasPrestados.PlayerArticulatedAnimator
+  visualRoot: {fileID: 2108456702}
+  controller: {fileID: 1540022718}
+  body: {fileID: 1540022720}
+  walkSpeedThreshold: 0.35
+  jumpVelocityThreshold: 0.6
+  fallVelocityThreshold: -0.15
+  landingDuration: 0.18
+  walkCycleSpeed: 9.5
+  legSwingDegrees: 28
+  armSwingDegrees: 22
+  torsoBobDegrees: 3.5
+  headBobDegrees: 2.5
+  idleBreathSpeed: 2.2
+  idleBreathDegrees: 2
+  jumpArmDegrees: -28
+  jumpLegDegrees: -12
+  fallArmDegrees: 18
+  fallLegDegrees: 22
+  landingSquashDegrees: 16
+  sortingLayerName: Gameplay
+  sortingOrderBase: 20
 --- !u!1 &1540657611
 GameObject:
   m_ObjectHideFlags: 0
