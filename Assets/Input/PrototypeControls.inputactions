@@ -138,7 +138,7 @@
                 {
                     "name": "",
                     "id": "b4c5d6e7-f8a9-4012-b345-0123456789ab",
-                    "path": "<Keyboard>/space",
+                    "path": "<Keyboard>/upArrow",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",

@@ -100,12 +100,12 @@ namespace DiasPrestados.Editor
                     EditorGUIUtility.PingObject(sceneAsset);
                 }
 
-                Debug.Log($"[Días Prestados] Prototipo creado en {ScenePath}. Pulsa Play para probar (A/D o flechas + Espacio).");
+                Debug.Log($"[Días Prestados] Prototipo creado en {ScenePath}. Pulsa Play para probar (A/D o ←/→; salto ↑).");
                 if (!Application.isBatchMode)
                 {
                     EditorUtility.DisplayDialog(
                         "Días Prestados",
-                        "Prototipo creado.\n\nEscena: Assets/Scenes/Prototype.unity\nControles: A/D o flechas + Espacio.\n\nPulsa Play para jugar.",
+                        "Prototipo creado.\n\nEscena: Assets/Scenes/Prototype.unity\nControles: A/D o ←/→; salto ↑.\n\nPulsa Play para jugar.",
                         "Aceptar");
                 }
             }

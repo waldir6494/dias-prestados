@@ -28,7 +28,7 @@ Base jugable + demo atmosférica de bosque:
 
 1. **Tools → Dias Prestados → Crear prototipo**
 2. Abrir `Assets/Scenes/Prototype.unity`
-3. Play — controles: **A/D** o flechas + **Espacio**
+3. Play — controles: **A/D** o flechas ←/→; salto: **↑**
 
 ### Forest Demo (bosque misterioso)
 
@@ -46,6 +46,12 @@ Base jugable + demo atmosférica de bosque:
 4. No toca colliders, posiciones ni escalas de gameplay (los sprites nuevos conservan exactamente los bounds).
 5. Paleta: `#1B2733`, `#3A4A4C`, `#7C8A8A`, `#B9B3A0`, acento `#E8A84A` (ver `AtmospherePalette`).
 6. Código: `ForestAtmosphereArtGenerator.cs`, `ForestAtmosphereSceneBuilder.cs`, arte en `Assets/Art/ForestAtmosphere/`.
+
+### Forest Organic Demo (tramo de prueba)
+
+1. **Tools → Dias Prestados → Crear / actualizar Forest Organic Demo** (parte de `ForestAtmosphereDemo.unity`, que no se modifica).
+2. Abrir `Assets/Scenes/ForestOrganicDemo.unity`. Geometría única en `Assets/Editor/ForestOrganicLayout.cs` (sprites y colliders salen de ella).
+3. Comprobación geométrica en Edit Mode: **Tools → Dias Prestados → Comprobar ruta Forest Organic**.
 
 ## Estructura relevante
 
