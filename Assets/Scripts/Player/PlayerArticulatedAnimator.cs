@@ -148,9 +148,10 @@ namespace DiasPrestados
             rig.transform.SetParent(visualRoot, false);
             // El Visual ya está anclado a los pies (y ≈ -0.85). El hip queda cerca del suelo lógico.
             rig.transform.localPosition = Vector3.zero;
-            rig.transform.localScale = Vector3.one * 0.92f;
+            // Escala aproximada al sprite de perfil (~1.7 u de alto con Visual en y=-0.85).
+            rig.transform.localScale = Vector3.one * 1.05f;
 
-            hip = CreatePart(rig.transform, "Hip", sprites.hip, new Vector3(0f, 0.72f, 0f), sortingOrderBase + 2);
+            hip = CreatePart(rig.transform, "Hip", sprites.hip, new Vector3(0f, 0.78f, 0f), sortingOrderBase + 2);
             torso = CreatePart(hip, "Torso", sprites.torso, new Vector3(0.02f, 0.06f, 0f), sortingOrderBase + 4);
             head = CreatePart(torso, "Head", sprites.head, new Vector3(0.04f, 0.52f, 0f), sortingOrderBase + 8);
             scarf = CreatePart(torso, "Scarf", sprites.scarf, new Vector3(0.06f, 0.42f, 0f), sortingOrderBase + 7);
@@ -316,7 +317,8 @@ namespace DiasPrestados
             float kneeB = 0f;
             float torsoZ = 0f;
             float headZ = 0f;
-            float hipY = 0.72f;
+            const float hipRestY = 0.78f;
+            float hipY = hipRestY;
             float scarfZ = 0f;
 
             switch (state)
@@ -347,7 +349,7 @@ namespace DiasPrestados
                     armB = swing * armSwingDegrees;
                     torsoZ = swing * torsoBobDegrees;
                     headZ = -swing * headBobDegrees;
-                    hipY = 0.72f + Mathf.Abs(swing) * 0.025f;
+                    hipY = hipRestY + Mathf.Abs(swing) * 0.025f;
                     scarfZ = swing * 8f;
                     break;
                 }
@@ -362,7 +364,7 @@ namespace DiasPrestados
                     torsoZ = -6f;
                     headZ = 4f;
                     scarfZ = -12f;
-                    hipY = 0.74f;
+                    hipY = hipRestY + 0.02f;
                     break;
                 }
                 case AnimState.Fall:
@@ -376,7 +378,7 @@ namespace DiasPrestados
                     torsoZ = 5f;
                     headZ = -3f;
                     scarfZ = 16f;
-                    hipY = 0.71f;
+                    hipY = hipRestY - 0.01f;
                     break;
                 }
                 case AnimState.Landing:
@@ -391,7 +393,7 @@ namespace DiasPrestados
                     armB = squash * 0.35f;
                     torsoZ = squash * 0.4f;
                     headZ = -squash * 0.25f;
-                    hipY = 0.72f - squash * 0.004f;
+                    hipY = hipRestY - squash * 0.004f;
                     scarfZ = squash * 0.5f;
                     break;
                 }
