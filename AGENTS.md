@@ -38,6 +38,15 @@ Base jugable + demo atmosférica de bosque:
 4. Si ya existe: solo regenera nodos gestionados (`ForestVisuals`, estilo visual, luces cálidas, partículas). **No** sustituye el Player ni recrea colisiones desde cero.
 5. Abrir `Assets/Scenes/ForestDemo.unity` y pulsar Play.
 
+### Forest Atmosphere Demo (Fase 1 "Memoria desvanecida")
+
+1. Debe existir `ForestDemo.unity` (no se modifica).
+2. **Tools → Dias Prestados → Crear / actualizar Forest Atmosphere Demo**
+3. Copia ForestDemo → `ForestAtmosphereDemo.unity` y aplica paleta fría, niebla por capas, luz global clara, acentos cálidos (#E8A84A), motas suaves y viñeta mínima (`AtmosphereVignette`).
+4. No toca colliders, posiciones ni escalas de gameplay (los sprites nuevos conservan exactamente los bounds).
+5. Paleta: `#1B2733`, `#3A4A4C`, `#7C8A8A`, `#B9B3A0`, acento `#E8A84A` (ver `AtmospherePalette`).
+6. Código: `ForestAtmosphereArtGenerator.cs`, `ForestAtmosphereSceneBuilder.cs`, arte en `Assets/Art/ForestAtmosphere/`.
+
 ## Estructura relevante
 
 ```
