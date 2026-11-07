@@ -128,3 +128,6 @@ Assets/
 - Abrir `ForestDemo.unity` (no Prototype).
 - Play: mismo control/fisica que Prototype.
 - Comprobar parallax al caminar, cielo atardecer, estación/raíles al fondo, luces cálidas, motas, que la decoración no empuje al jugador.
+- Legibilidad: suelo/plataformas (tapa clara), cajas de madera, rocas sólidas vs `FG_Rock_*` decorativas, arbustos de bajo contraste.
+- Depuración: **Tools → Dias Prestados → Mostrar colliders del escenario** (solo Scene View).
+- Backup previo a cambios fuertes: `Assets/Scenes/Backups/`.

@@ -24,8 +24,13 @@ namespace DiasPrestados.Editor
             public const string Grass = ArtFolder + "/grass_tuft.png";
             public const string RockLarge = ArtFolder + "/rock_large.png";
             public const string RockSmall = ArtFolder + "/rock_small.png";
+            public const string RockSolid = ArtFolder + "/rock_solid.png";
+            public const string RockDecor = ArtFolder + "/rock_decor.png";
             public const string Ground = ArtFolder + "/ground_earth.png";
+            public const string GroundShelf = ArtFolder + "/ground_shelf.png";
             public const string Platform = ArtFolder + "/platform_wood.png";
+            public const string PlatformShadow = ArtFolder + "/platform_shadow.png";
+            public const string Crate = ArtFolder + "/crate_wood.png";
             public const string Rail = ArtFolder + "/rail_segment.png";
             public const string Station = ArtFolder + "/station_abandoned.png";
             public const string Dust = ArtFolder + "/dust_mote.png";
@@ -49,8 +54,14 @@ namespace DiasPrestados.Editor
             Write(Paths.Grass, GrassTuft(32, 24, new Color(0.25f, 0.42f, 0.22f)), 32f, FilterMode.Point);
             Write(Paths.RockLarge, Rock(64, 40, new Color(0.42f, 0.40f, 0.44f)), 32f, FilterMode.Point);
             Write(Paths.RockSmall, Rock(32, 22, new Color(0.38f, 0.36f, 0.40f)), 32f, FilterMode.Point);
+            Write(Paths.RockSolid, RockSolidObstacle(64, 48), 32f, FilterMode.Point);
+            Write(Paths.RockDecor, RockDecorSoft(48, 28), 32f, FilterMode.Point);
             Write(Paths.Ground, Ground(128, 64), 32f, FilterMode.Point);
-            Write(Paths.Platform, PlatformWood(96, 24), 32f, FilterMode.Point);
+            Write(Paths.GroundShelf, GroundShelf(128, 64), 32f, FilterMode.Point);
+            Write(Paths.Platform, PlatformWood(96, 32), 32f, FilterMode.Point);
+            Write(Paths.PlatformShadow, PlatformShadow(96, 16), 32f, FilterMode.Bilinear);
+            // PPU 48 => bounds ~1x1, coherente con scale de Obstacle_Crate del prototipo.
+            Write(Paths.Crate, CrateWood(48, 48), 48f, FilterMode.Point);
             Write(Paths.Rail, Rails(160, 24), 32f, FilterMode.Point);
             Write(Paths.Station, Station(160, 96), 32f, FilterMode.Point);
             Write(Paths.Dust, SoftDisc(16, new Color(1f, 0.92f, 0.75f, 0.65f)), 16f);
@@ -233,16 +244,42 @@ namespace DiasPrestados.Editor
         static Texture2D Ground(int w, int h)
         {
             var tex = ProceduralSpriteUtil.CreateTexture(w, h);
-            Color dirt = new Color(0.30f, 0.22f, 0.14f);
-            Color soil = new Color(0.24f, 0.18f, 0.12f);
-            Color grass = new Color(0.28f, 0.40f, 0.22f);
+            Color dirt = new Color(0.34f, 0.24f, 0.15f);
+            Color soil = new Color(0.22f, 0.16f, 0.11f);
+            Color grass = new Color(0.32f, 0.46f, 0.24f);
+            Color rim = new Color(0.18f, 0.28f, 0.14f);
             ProceduralSpriteUtil.FillRect(tex, 0, 0, w, h, soil);
-            ProceduralSpriteUtil.FillRect(tex, 0, h - 18, w, 18, dirt);
-            ProceduralSpriteUtil.FillRect(tex, 0, h - 8, w, 8, grass);
-            for (int x = 0; x < w; x += 6)
+            ProceduralSpriteUtil.FillRect(tex, 0, h - 22, w, 22, dirt);
+            ProceduralSpriteUtil.FillRect(tex, 0, h - 10, w, 10, grass);
+            ProceduralSpriteUtil.FillRect(tex, 0, h - 11, w, 2, rim);
+            for (int x = 0; x < w; x += 5)
             {
-                ProceduralSpriteUtil.Set(tex, x, h - 10, Color.Lerp(grass, Color.black, 0.2f));
-                ProceduralSpriteUtil.Set(tex, x + 2, h - 12, new Color(0.18f, 0.14f, 0.1f));
+                ProceduralSpriteUtil.Set(tex, x, h - 8, Color.Lerp(grass, Color.black, 0.25f));
+            }
+
+            tex.Apply();
+            return tex;
+        }
+
+        static Texture2D GroundShelf(int w, int h)
+        {
+            var tex = ProceduralSpriteUtil.CreateTexture(w, h);
+            Color cliff = new Color(0.22f, 0.15f, 0.10f);
+            Color face = new Color(0.42f, 0.30f, 0.18f);
+            Color top = new Color(0.42f, 0.55f, 0.30f);
+            Color lip = new Color(0.72f, 0.55f, 0.30f);
+            Color highlight = new Color(0.85f, 0.72f, 0.42f);
+            Color shadow = new Color(0.08f, 0.06f, 0.05f);
+            ProceduralSpriteUtil.FillRect(tex, 0, 0, w, h, cliff);
+            ProceduralSpriteUtil.FillRect(tex, 0, h / 3, w, h / 2, face);
+            // Escalón: labio claro muy visible + hierba encima.
+            ProceduralSpriteUtil.FillRect(tex, 0, h - 18, w, 18, top);
+            ProceduralSpriteUtil.FillRect(tex, 0, h - 20, w, 4, lip);
+            ProceduralSpriteUtil.FillRect(tex, 0, h - 21, w, 1, highlight);
+            ProceduralSpriteUtil.FillRect(tex, 0, 0, w, 5, shadow);
+            for (int x = 6; x < w; x += 14)
+            {
+                ProceduralSpriteUtil.FillRect(tex, x, 6, 2, h / 2, Color.Lerp(cliff, Color.black, 0.25f));
             }
 
             tex.Apply();
@@ -252,17 +289,111 @@ namespace DiasPrestados.Editor
         static Texture2D PlatformWood(int w, int h)
         {
             var tex = ProceduralSpriteUtil.CreateTexture(w, h);
-            Color plank = new Color(0.42f, 0.28f, 0.16f);
-            Color edge = new Color(0.28f, 0.18f, 0.10f);
-            Color moss = new Color(0.25f, 0.38f, 0.20f, 0.85f);
-            ProceduralSpriteUtil.FillRect(tex, 0, 0, w, h, plank);
-            ProceduralSpriteUtil.FillRect(tex, 0, h - 4, w, 4, moss);
-            ProceduralSpriteUtil.FillRect(tex, 0, 0, w, 2, edge);
-            for (int x = 8; x < w; x += 16)
+            Color underside = new Color(0.10f, 0.06f, 0.04f);
+            Color body = new Color(0.50f, 0.32f, 0.16f);
+            Color plank = new Color(0.68f, 0.48f, 0.26f);
+            Color top = new Color(0.86f, 0.66f, 0.38f);
+            Color rim = new Color(0.18f, 0.10f, 0.06f);
+            Color highlight = new Color(0.95f, 0.82f, 0.55f);
+            ProceduralSpriteUtil.FillRect(tex, 0, 0, w, h, underside);
+            ProceduralSpriteUtil.FillRect(tex, 0, 5, w, h - 5, body);
+            ProceduralSpriteUtil.FillRect(tex, 1, h - 12, w - 2, 10, plank);
+            ProceduralSpriteUtil.FillRect(tex, 1, h - 6, w - 2, 5, top);
+            ProceduralSpriteUtil.FillRect(tex, 1, h - 2, w - 2, 1, highlight);
+            ProceduralSpriteUtil.FillRect(tex, 0, h - 13, w, 2, rim);
+            ProceduralSpriteUtil.FillRect(tex, 0, 4, w, 2, rim);
+            ProceduralSpriteUtil.FillRect(tex, 0, 0, 2, h, rim);
+            ProceduralSpriteUtil.FillRect(tex, w - 2, 0, 2, h, rim);
+            for (int x = 10; x < w - 4; x += 14)
             {
-                ProceduralSpriteUtil.FillRect(tex, x, 1, 1, h - 2, Color.Lerp(plank, Color.black, 0.2f));
+                ProceduralSpriteUtil.FillRect(tex, x, 6, 1, h - 10, Color.Lerp(body, Color.black, 0.3f));
             }
 
+            // Clavos / detalle de volumen.
+            for (int x = 8; x < w - 6; x += 18)
+            {
+                ProceduralSpriteUtil.Set(tex, x, h - 8, new Color(0.2f, 0.16f, 0.12f));
+                ProceduralSpriteUtil.Set(tex, x + 1, h - 8, new Color(0.45f, 0.35f, 0.22f));
+            }
+
+            tex.Apply();
+            return tex;
+        }
+
+        static Texture2D PlatformShadow(int w, int h)
+        {
+            var tex = ProceduralSpriteUtil.CreateTexture(w, h);
+            for (int y = 0; y < h; y++)
+            {
+                float t = 1f - y / (float)Mathf.Max(1, h - 1);
+                Color c = new Color(0f, 0f, 0f, 0.35f * t * t);
+                for (int x = 0; x < w; x++)
+                {
+                    float edge = Mathf.Min(x, w - 1 - x) / (w * 0.2f);
+                    edge = Mathf.Clamp01(edge);
+                    Color px = c;
+                    px.a *= edge;
+                    tex.SetPixel(x, y, px);
+                }
+            }
+
+            tex.Apply();
+            return tex;
+        }
+
+        static Texture2D CrateWood(int w, int h)
+        {
+            var tex = ProceduralSpriteUtil.CreateTexture(w, h);
+            Color dark = new Color(0.22f, 0.14f, 0.08f);
+            Color mid = new Color(0.48f, 0.32f, 0.16f);
+            Color light = new Color(0.62f, 0.44f, 0.24f);
+            Color band = new Color(0.30f, 0.22f, 0.14f);
+            ProceduralSpriteUtil.FillRect(tex, 0, 0, w, h, dark);
+            ProceduralSpriteUtil.FillRect(tex, 2, 2, w - 4, h - 4, mid);
+            ProceduralSpriteUtil.FillRect(tex, 3, h - 10, w - 6, 6, light);
+            ProceduralSpriteUtil.FillRect(tex, 2, h / 2 - 2, w - 4, 4, band);
+            ProceduralSpriteUtil.FillRect(tex, w / 2 - 2, 2, 4, h - 4, band);
+            for (int y = 6; y < h - 4; y += 8)
+            {
+                ProceduralSpriteUtil.FillRect(tex, 4, y, w - 8, 1, Color.Lerp(mid, Color.black, 0.2f));
+            }
+
+            ProceduralSpriteUtil.FillRect(tex, 0, 0, w, 2, dark);
+            ProceduralSpriteUtil.FillRect(tex, 0, h - 2, w, 2, dark);
+            ProceduralSpriteUtil.FillRect(tex, 0, 0, 2, h, dark);
+            ProceduralSpriteUtil.FillRect(tex, w - 2, 0, 2, h, dark);
+            tex.Apply();
+            return tex;
+        }
+
+        static Texture2D RockSolidObstacle(int w, int h)
+        {
+            var tex = ProceduralSpriteUtil.CreateTexture(w, h);
+            Color baseCol = new Color(0.36f, 0.32f, 0.30f);
+            Color face = new Color(0.58f, 0.54f, 0.48f);
+            Color edge = new Color(0.12f, 0.10f, 0.09f);
+            Color moss = new Color(0.30f, 0.44f, 0.22f);
+            Color crack = new Color(0.18f, 0.16f, 0.14f);
+            ProceduralSpriteUtil.FillEllipse(tex, w / 2, h / 2 - 2, w / 2 - 1, h / 2 - 2, edge);
+            ProceduralSpriteUtil.FillEllipse(tex, w / 2, h / 2 - 1, w / 2 - 3, h / 2 - 4, baseCol);
+            ProceduralSpriteUtil.FillRect(tex, 8, 7, w - 16, h - 15, face);
+            ProceduralSpriteUtil.FillRect(tex, 8, h - 13, w - 16, 5, moss);
+            ProceduralSpriteUtil.FillRect(tex, 8, 7, w - 16, 3, edge);
+            ProceduralSpriteUtil.FillRect(tex, 8, 7, 3, h - 15, edge);
+            ProceduralSpriteUtil.FillRect(tex, w - 11, 7, 3, h - 15, Color.Lerp(face, Color.white, 0.22f));
+            ProceduralSpriteUtil.FillRect(tex, 14, 14, w / 3, 3, crack);
+            ProceduralSpriteUtil.FillRect(tex, w / 2, 12, 2, h / 3, crack);
+            tex.Apply();
+            return tex;
+        }
+
+        static Texture2D RockDecorSoft(int w, int h)
+        {
+            var tex = ProceduralSpriteUtil.CreateTexture(w, h);
+            Color soft = new Color(0.28f, 0.32f, 0.36f, 0.75f);
+            Color softer = new Color(0.22f, 0.26f, 0.30f, 0.55f);
+            ProceduralSpriteUtil.FillEllipse(tex, w / 2, h / 2 - 1, w / 2 - 2, h / 2 - 3, soft);
+            ProceduralSpriteUtil.FillEllipse(tex, w / 2 - 4, h / 2, w / 3, h / 3, softer);
             tex.Apply();
             return tex;
         }
