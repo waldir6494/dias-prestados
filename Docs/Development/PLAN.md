@@ -1,21 +1,17 @@
 # Plan — Animaciones del protagonista
 
-## Hecho
+## Diagnóstico (post Play Mode)
 
-- Diseño Idle = PNG aprobado (no rediseñar).
-- Walk 8 fotogramas extraídos del zip en `Assets/Art/Characters/Protagonist/Walk/`.
-- Integración **solo Walk**: clips + Animator + sync `|vx|`.
-- Sin marioneta; sin root motion físico; física/cámara intactas.
+Los 8 Walk del zip son la fuente de cortes/baja definición/estilo distinto al PNG aprobado. Extracción OK (byte-idénticos). Tight mesh + Idle painterly empeoraban el resultado en juego.
 
-## En curso / siguiente arte
+## Correcciones técnicas (hecho)
 
-| Set | Estado |
-|-----|--------|
-| Walk 8 | Integrado (pixel; inconsistente vs Idle painterly) |
-| Idle animado ~4 | Pendiente — Idle actual = 1 frame aprobado |
-| Run 8 | Pendiente |
-| Jump / Fall / Landing | Pendiente |
+Full Rect + Point; Idle=`walk_01`; escala única; `Grounded`; sin root motion / sin escalas por estado.
 
-## Criterio de calidad pendiente
+## Bloqueo artístico
 
-Unificar estilo Walk con el PNG aprobado (o aceptar pixel como dirección y redibujar Idle). Mitigar jitter de pivote/silueta entre frames Walk.
+Regenerar `walk_01..08` (+ idle/jump/fall/land) al estilo `ProtagonistApproved`. Detalle de entrega en `PROGRESS.md` §3.
+
+## No hacer
+
+Marioneta; HD falso; escalas distintas por estado; estados Jump/Fall/Landing inventados; tocar física/cámara; regenerar escena.

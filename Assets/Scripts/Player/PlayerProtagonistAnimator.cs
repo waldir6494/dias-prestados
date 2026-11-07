@@ -3,14 +3,16 @@ using UnityEngine;
 namespace DiasPrestados
 {
     /// <summary>
-    /// Driver de Animator del protagonista: Idle (PNG aprobado) ↔ Walk (8 fotogramas).
-    /// Solo Walk está integrado por frames. Sin root motion físico.
+    /// Driver del Animator: Idle↔Walk del mismo set pixel (walk_01..08).
+    /// No cambia a ProtagonistApproved (evita salto de estilo).
+    /// Jump/Fall/Landing: sin clips válidos — no se inventan; ver Docs.
+    /// Sin root motion; sin escalas distintas por estado.
     /// </summary>
     [DisallowMultipleComponent]
     public class PlayerProtagonistAnimator : MonoBehaviour
     {
         const string SpeedParam = "Speed";
-        const string WalkStateName = "Walk";
+        const string GroundedParam = "Grounded";
 
         [Header("Referencias")]
         [SerializeField] Transform visualRoot;
@@ -26,12 +28,12 @@ namespace DiasPrestados
         [SerializeField] float minAnimSpeed = 0.55f;
         [SerializeField] float maxAnimSpeed = 1.6f;
 
-        [Header("Escala visual (Idle painterly vs Walk pixel)")]
-        [SerializeField] float idleVisualScale = 1f;
-        [Tooltip("Walk a PPU 48 queda ~2.25u; se escala para acercarse a la altura Idle ~1.72u.")]
-        [SerializeField] float walkVisualScale = 0.76f;
+        [Header("Escala única del Visual (todos los estados)")]
+        [Tooltip("Una sola escala para el set Walk. No usar escalas distintas Idle/Walk.")]
+        [SerializeField] float visualScale = 0.76f;
 
         int speedHash;
+        int groundedHash;
         Vector3 restLocalPosition;
         bool restPoseCached;
 
@@ -49,11 +51,14 @@ namespace DiasPrestados
 
             ResolveVisual();
             speedHash = Animator.StringToHash(SpeedParam);
+            groundedHash = Animator.StringToHash(GroundedParam);
 
             if (visualRoot != null)
             {
                 restLocalPosition = visualRoot.localPosition;
                 restPoseCached = true;
+                // Escala única estable (no por estado).
+                visualRoot.localScale = new Vector3(visualScale, visualScale, 1f);
             }
 
             if (animator != null)
@@ -94,22 +99,23 @@ namespace DiasPrestados
                 return;
             }
 
-            // Sin root motion visual: posición del Visual fija (pies en y=-0.85).
+            // Sin root motion visual: no tocar posición/rotación del Visual.
             if (restPoseCached)
             {
                 visualRoot.localPosition = restLocalPosition;
                 visualRoot.localRotation = Quaternion.identity;
+                visualRoot.localScale = new Vector3(visualScale, visualScale, 1f);
             }
 
             float absVx = Mathf.Abs(body.linearVelocity.x);
             bool grounded = controller.IsGrounded;
-            float speedParam = grounded ? absVx : 0f;
-            animator.SetFloat(speedHash, speedParam);
 
-            bool walking = grounded && absVx > walkSpeedThreshold;
-            float targetScale = walking ? walkVisualScale : idleVisualScale;
-            visualRoot.localScale = new Vector3(targetScale, targetScale, 1f);
+            // Speed siempre refleja |vx| (también en aire) para no forzar Idle painterly.
+            // Idle/Walk usan el mismo set pixel; Jump/Fall reales siguen pendientes de arte.
+            animator.SetFloat(speedHash, absVx);
+            animator.SetBool(groundedHash, grounded);
 
+            bool walking = absVx > walkSpeedThreshold;
             if (walking)
             {
                 float play = absVx / Mathf.Max(0.01f, referenceWalkSpeed);

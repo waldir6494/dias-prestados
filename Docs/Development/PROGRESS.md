@@ -1,53 +1,66 @@
 # Progress — Animaciones del protagonista
 
-## Estado: Walk por fotogramas INTEGRADO (solo Walk)
+## Veredicto tras Play Mode de David
 
-Rama/PR: `cursor/animaciones-protagonista-2f38` / [#1](https://github.com/davidmartirio/dias-prestados/pull/1)  
-Base mergeada: `origin/feature/prototipo-jugable` @ `5a38d45` (Walk zip). `ForestOrganicDemo` no regenerada.
+**Walk no es aceptable como arte final.** La causa principal de “partes cortadas / poca definición / acabado distinto” está en los **PNG originales del zip**, no en pérdida por extracción.
 
-## Hecho en esta entrega
+## 1) Causa de los recortes
 
-1. Merge de la base con el zip Walk (sin conflictos de escena).
-2. Extracción a PNG individuales:
-   - `/agent/repos/dias-prestados/Assets/Art/Characters/Protagonist/Walk/walk_01.png` … `walk_08.png`
-   - Zip de origen conservado.
-3. Validación: **8 hashes distintos**, RGBA + alpha, lienzo uniforme 128×160.
-4. Import: PPU **48**, pivot compartido en suelas (~0.496, 0.075).
-5. `Player_Walk.anim` @ **12 FPS**, loop, 8 sprites.
-6. `Player_Idle.anim` = 1 frame del PNG aprobado (Idle actual).
-7. `Player.controller`: Idle ↔ Walk por parámetro `Speed`.
-8. Animator en `Visual` (`applyRootMotion: 0`).
-9. `PlayerProtagonistAnimator`: escribe `Speed` = `|vx|` en suelo; `animator.speed` ∝ `|vx|` / 3.5; escala Walk 0.76 para acercar altura al Idle ~1.72u.
-10. Física / CapsuleCollider2D / GroundCheck / cámara / movimiento: **sin cambios**.
+| Hipótesis | Resultado |
+|-----------|-----------|
+| Píxeles perdidos al extraer el zip | **No.** `walk_01..08` en disco = **byte-idénticos** al zip. |
+| Contenido fuera del lienzo 128×160 | **No** en bordes del canvas (márgenes L~31–36, R~40+, T~40, B~11–13; 0 opacos en borde). |
+| Importer (Tight mesh / bilinear) | **Contribuye** a sensación de corte/blur. `spriteMeshType: Tight` + `filterMode: Bilinear` empeoran bordes blandos. |
+| Clip anima Transform/escala | **No.** `Player_Walk.anim` solo curva `m_Sprite`. |
+| Escala distinta Idle/Walk | **Contribuía** al salto visual. Eliminada. |
+| Idle = `ProtagonistApproved` painterly | **Causa** del “reaparece el PNG estático / cambio inconsistente” y del PNG en Jump/Fall (Speed=0 → Idle painterly). |
+| Arte fuente | **Sí.** Personaje ~50–55×105 px en canvas 128×160; bordes masticados / huecos (p.ej. cintura); estilo **pixel** ≠ PNG aprobado **painterly** ~149×486. |
 
-## Inconsistencias de dibujo (no ocultas)
+**Conclusión:** hay que **regenerar** los frames Walk (y el resto) al estilo del PNG aprobado. No se “arregla” con upscale/filtros/HD falso.
 
-| Tema | Detalle |
-|------|---------|
-| Estilo | Walk = **pixel art** 128×160; Idle (`ProtagonistApproved`) = **pintura** 153×490. No es el mismo pipeline artístico. |
-| Proporciones | Walk a PPU 48 ≈ **2.25 u** de alto opaco; Idle ≈ **1.72 u**. Se usa `walkVisualScale=0.76` para mitigar el salto de tamaño al caminar — es un parche de integración, no arte unificado. |
-| Silueta / detalle | Entre frames Walk hay jitter menor (pelo, bufanda, mochila). Documentado; no “arreglado” con procedural. |
-| Pivot horizontal | `feet_cx` varía por frame (~0.45–0.55); pivot común promedio — puede haber micro-desliz lateral residual. |
-| Aéreos / Run / Idle animado | **No** integrados (fuera de alcance). |
+## 2) Correcciones técnicas hechas
 
-## Play Mode
+- Importer Walk: `spriteMeshType: Full Rect`, `filterMode: Point`, alpha OK, sin compresión, PPU 48, pivot pies.
+- Idle del Animator = `walk_01` (mismo set), **no** `ProtagonistApproved`.
+- Escala **única** `visualScale=0.76` en Visual (no por estado).
+- Parámetro `Grounded`; Walk→Idle exige suelo (evita “Idle painterly” en aire).
+- `Speed=|vx|` también en aire (misma familia visual).
+- Default sprite del Visual = `walk_01`.
+- Física / PlayerController2D / cámara / escena (salvo Visual) **sin tocar**.
 
-**No ejecutado** aquí (Unity Editor ausente). Validación estática de assets/YAML sí.
+## 3) Pendiente artístico (regenerar / entregar)
 
-## Checklist Unity 6.6
+Reemplazar estos PNG (mismo diseño que `ProtagonistApproved`: painterly, pelo/bufanda/mochila/brazos/piernas/botas completos, alpha limpio, **sin** magenta bleed):
 
-1. Abrir proyecto; dejar reimportar `Walk/walk_0*.png` (PPU 48, pivot pies).
-2. Abrir `Assets/Scenes/ForestOrganicDemo.unity` (no regenerar).
-3. `Player/Visual`: SpriteRenderer + **Animator** → controller `Player`.
-4. `Player`: `PlayerProtagonistAnimator` con refs a Visual/Animator/Rigidbody.
-5. Play — quieto: Idle = PNG aprobado.
-6. Play — A/D en suelo: ciclo Walk 8 frames; piernas/brazos se mueven; sin root motion del Rigidbody.
-7. Velocidad más alta → `animator.speed` sube (menos patinaje).
-8. Giro: `flipX` del sprite; collider sin escala negativa.
-9. Pies: Visual y=-0.85; comprobar que no flotan/hunden respecto al suelo del bosque.
-10. Confirmar cápsula 0.55×1.7 y GroundCheck intactos.
-11. Anotar en arte el salto Idle painterly ↔ Walk pixel.
+| Archivo | Lienzo sugerido | Pivot | Notas |
+|---------|-----------------|-------|-------|
+| `walk_01.png` … `walk_08.png` | Uniforme, p.ej. **256×384** o mayor (contenido ~≥180 px de alto) | Pies / bottom-center | Ciclo completo; sin huecos de cintura; stride sin truncar pies |
+| `idle_01.png` … `idle_04.png` (aprox.) | Mismo lienzo/PPU que Walk | Pies | Sustituir el Idle provisional (`walk_01`) |
+| `jump_01`…`jump_0N` (2–4) | Igual | Pies | Despegue/ascenso |
+| `fall_01`…`fall_0N` (1–2) | Igual | Pies | Descenso |
+| `land_01`…`land_0N` (2–3) | Igual | Pies | Aterrizaje |
 
-## Pendiente (no este PR scope)
+Hasta entonces: **no** inventar Jump/Fall/Landing con estáticos.
 
-Run 8 · Idle animado ~4 · Jump · Fall · Landing · unificar estilo con el PNG aprobado.
+## 4) Estado real por animación
+
+| Estado | Estado real |
+|--------|-------------|
+| Idle | Provisional: hold `walk_01` (pixel). **No** es el PNG aprobado. |
+| Walk | 8 frames del zip (pixel, baja def., artefactos de origen). Técnicamente cableado; **artísticamente rechazable**. |
+| Jump | **Ausente** (sin frames). En aire no se fuerza el PNG painterly. |
+| Fall | **Ausente**. |
+| Landing | **Ausente**. |
+
+## 5) Checklist Unity
+
+1. Reimportar `Walk/walk_0*.png` (Full Rect, Point, PPU 48).
+2. `ForestOrganicDemo` → `Visual`: sprite `walk_01`, scale 0.76, Animator `Player`, root motion off.
+3. Idle quieto: se ve `walk_01` (pixel), **no** el perfil painterly.
+4. Walk: ciclo 8; sin cambio a PNG aprobado al parar/saltar.
+5. Confirmar cápsula/GroundCheck/física iguales.
+6. Comparar Walk vs `ProtagonistApproved` — debe seguir viéndose el gap artístico hasta regenerar frames.
+
+## Play Mode en este entorno
+
+No re-ejecutado (Unity ausente). Correcciones basadas en inspección de assets + causa confirmada del Idle painterly en aire.
