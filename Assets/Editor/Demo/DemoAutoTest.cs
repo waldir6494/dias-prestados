@@ -46,8 +46,17 @@ namespace DiasPrestados.Editor.Demo
             if (state == PlayModeStateChange.EnteredPlayMode && SessionState.GetBool(SessionKey, false))
             {
                 SessionState.SetBool(SessionKey, false);
-                var go = new GameObject("__DemoAutoTestRunner");
-                go.AddComponent<DemoAutoTestRunner>();
+                // delayCall: con Enter Play Mode Options (sin domain reload) el runner
+                // a veces no arranca si se crea en el mismo callback del cambio de modo.
+                EditorApplication.delayCall += () =>
+                {
+                    if (!Application.isPlaying)
+                        return;
+                    if (Object.FindAnyObjectByType<DemoAutoTestRunner>() != null)
+                        return;
+                    var go = new GameObject("__DemoAutoTestRunner");
+                    go.AddComponent<DemoAutoTestRunner>();
+                };
             }
         }
     }

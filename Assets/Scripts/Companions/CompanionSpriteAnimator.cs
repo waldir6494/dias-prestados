@@ -21,9 +21,11 @@ namespace DiasPrestados.Companions
         [SerializeField] Sprite[] cheer;
 
         [Header("Velocidades (fotogramas/s)")]
-        [SerializeField] float idleFps = 1.6f;
-        [SerializeField] float walkFpsMin = 8f;
-        [SerializeField] float walkFpsMax = 15f;
+        [SerializeField] float idleFps = 3f;
+        [SerializeField] float walkFpsMin = 6f;
+        [SerializeField] float walkFpsMax = 22f;
+        [Tooltip("Distancia (u) por ciclo de caminar: los pasos siguen a la velocidad real.")]
+        [SerializeField] float strideLength = 1.55f;
         [SerializeField] float askFps = 4.5f;
         [SerializeField] float cheerFps = 6f;
 
@@ -79,7 +81,7 @@ namespace DiasPrestados.Companions
                     else if (Mathf.Abs(v.x) > 0.5f)
                     {
                         set = walk;
-                        fps = Mathf.Lerp(walkFpsMin, walkFpsMax, Mathf.Clamp01(Mathf.Abs(v.x) / 8f));
+                        fps = Mathf.Clamp(Mathf.Abs(v.x) / strideLength * walk.Length, walkFpsMin, walkFpsMax);
                     }
                     else
                     {

@@ -32,6 +32,23 @@ namespace DiasPrestados
         [Tooltip("Una sola escala para el set Walk. No usar escalas distintas Idle/Walk.")]
         [SerializeField] float visualScale = 0.76f;
 
+        [Header("Sincronía por distancia")]
+        [Tooltip("Distancia (u) que recorre el personaje durante un ciclo completo de caminar.")]
+        [SerializeField] float strideLength = 1.6f;
+        [SerializeField] float holdWalkTime = 0.12f;
+
+        [Header("Idle — respiración sutil")]
+        [SerializeField] float idleBreathHz = 0.85f;
+        [SerializeField] float idleBreathAmpY = 0.018f;
+        [SerializeField] float idleBreathAmpScale = 0.014f;
+
+        const string WalkState = "Walk";
+        const string IdleState = "Idle";
+        float phase;
+        float holdTimer;
+        bool wasWalking;
+        float idleBreathTime;
+
         int speedHash;
         int groundedHash;
         Vector3 restLocalPosition;
@@ -99,14 +116,6 @@ namespace DiasPrestados
                 return;
             }
 
-            // Sin root motion visual: no tocar posición/rotación del Visual.
-            if (restPoseCached)
-            {
-                visualRoot.localPosition = restLocalPosition;
-                visualRoot.localRotation = Quaternion.identity;
-                visualRoot.localScale = new Vector3(visualScale, visualScale, 1f);
-            }
-
             float absVx = Mathf.Abs(body.linearVelocity.x);
             bool grounded = controller.IsGrounded;
 
@@ -115,15 +124,59 @@ namespace DiasPrestados
             animator.SetFloat(speedHash, absVx);
             animator.SetBool(groundedHash, grounded);
 
-            bool walking = absVx > walkSpeedThreshold;
-            if (walking)
+            // Con toques cortos de A/D la velocidad apenas supera el umbral unos frames: el ciclo no llegaba a
+            // moverse. Se sincroniza por distancia recorrida (cada paso mueve las piernas) y la intención de
+            // moverse mantiene la pose de caminar un instante.
+            bool moving = absVx > walkSpeedThreshold || (grounded && Mathf.Abs(controller.MoveInput) > 0.1f);
+            if (moving)
             {
-                float play = absVx / Mathf.Max(0.01f, referenceWalkSpeed);
-                animator.speed = Mathf.Clamp(play, minAnimSpeed, maxAnimSpeed);
+                holdTimer = holdWalkTime;
+            }
+            else if (holdTimer > 0f)
+            {
+                holdTimer -= Time.deltaTime;
+            }
+
+            bool showWalk = holdTimer > 0f && grounded;
+            if (showWalk)
+            {
+                // Mínimo de avance por frame para que un toque mínimo ya cambie de fotograma.
+                phase += Mathf.Max(absVx, 1.2f) * Time.deltaTime / Mathf.Max(0.1f, strideLength);
+                animator.speed = 0f;
+                animator.Play(WalkState, 0, Mathf.Repeat(phase, 1f));
+                wasWalking = true;
+                idleBreathTime = 0f;
+                if (restPoseCached)
+                {
+                    visualRoot.localPosition = restLocalPosition;
+                    visualRoot.localRotation = Quaternion.identity;
+                    visualRoot.localScale = new Vector3(visualScale, visualScale, 1f);
+                }
             }
             else
             {
                 animator.speed = 1f;
+                if (wasWalking)
+                {
+                    animator.Play(IdleState, 0, 0f);
+                    wasWalking = false;
+                }
+
+                // Respiración / micro-movimientos en Idle (misma idea de vida que el idle del hermano).
+                if (restPoseCached)
+                {
+                    idleBreathTime += Time.deltaTime;
+                    float breath = Mathf.Sin(idleBreathTime * Mathf.PI * 2f * idleBreathHz);
+                    float secondary = Mathf.Sin(idleBreathTime * Mathf.PI * 2f * idleBreathHz * 0.5f + 0.6f);
+                    visualRoot.localRotation = Quaternion.identity;
+                    visualRoot.localPosition = restLocalPosition + new Vector3(
+                        secondary * idleBreathAmpY * 0.25f,
+                        breath * idleBreathAmpY,
+                        0f);
+                    float sy = visualScale * (1f + breath * idleBreathAmpScale);
+                    float sx = visualScale * (1f - breath * idleBreathAmpScale * 0.45f);
+                    visualRoot.localScale = new Vector3(sx, sy, 1f);
+                }
             }
         }
     }

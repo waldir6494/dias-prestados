@@ -21,3 +21,10 @@
 - Validado automÃ¡ticamente: Autotest en Play Mode (`Tools â†’ Dias Prestados â†’ Demo â†’ Autotest Hito 1 (Play Mode)`), resultado "TODO CORRECTO": avance, salto (~2,7 u), recorrido completo hasta xâ‰ˆ189, el pequeÃ±o pide ayuda, E lo impulsa al risco y sigue cerca al final. Informe en `Temp/DemoAutotest/report.txt` (no versionado).
 - Pendiente de prueba manual: sensaciÃ³n de control con teclado real, lectura visual en tu monitor, ritmo, y comparaciÃ³n con las referencias.
 - Sin commit realizado.
+
+## Correcciones Hito 1 (revisión)
+- Roca: escala reducida, orden de dibujo -3 y sin collider (decoración); el recorrido no tiene otros obstáculos solapados.
+- Protagonista: animación de caminar sincronizada con el desplazamiento y el input (toques cortos mueven las piernas).
+- Hermano pequeño: sprite rediseñado (gorro, bufanda, mochila, cara expresiva) con animaciones idle/walk/cheer más naturales.
+- Minipuzle: caja empujable (Crate_Pushable) para llegar al risco de x=100; reaparece si cae o se sale del tramo (sin softlock).
+- Autotest: TODO CORRECTO (toques cortos, caja + ayuda, impulso, final). Pendiente: revisión del usuario.

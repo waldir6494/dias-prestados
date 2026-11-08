@@ -24,6 +24,9 @@ namespace DiasPrestados.Editor.Demo
         public const float CliffX = 118f;        // risco alto (el hermano necesita ayuda)
         public const float CliffHeight = 2.3f;
         public const float CliffTopEndX = 146f;
+        public const float LedgeX = 100f;        // plataforma alta del minipuzle de la caja (no se alcanza saltando)
+        public const float LedgeHeight = 3.3f;
+        public const float LedgeEndX = 112f;
 
         public static float SmoothStep(float a, float b, float x)
         {
@@ -39,13 +42,16 @@ namespace DiasPrestados.Editor.Demo
             h -= StepHeight * SmoothStep(60f, 72f, x);
             h += CliffHeight * SmoothStep(CliffX - 0.15f, CliffX + 0.15f, x);
             h -= CliffHeight * SmoothStep(CliffTopEndX, 160f, x);
+            h += LedgeHeight * (SmoothStep(LedgeX - 0.15f, LedgeX + 0.15f, x) - SmoothStep(LedgeEndX - 0.15f, LedgeEndX + 0.15f, x));
 
             float undulation = 0.13f * Mathf.Sin(x * 0.23f) + 0.08f * Mathf.Sin(x * 0.61f + 1.3f);
             // Se atenúa junto a los elementos clave para que el borde sea legible y fiable.
             float nearFeature = Mathf.Min(
                 Mathf.Min(Mathf.Abs(x - RavineLeft), Mathf.Abs(x - RavineRight)),
-                Mathf.Min(Mathf.Abs(x - CliffX), Mathf.Abs(x - StepX)));
+                Mathf.Min(Mathf.Min(Mathf.Abs(x - CliffX), Mathf.Abs(x - StepX)), Mathf.Min(Mathf.Abs(x - LedgeX), Mathf.Abs(x - LedgeEndX))));
             float weight = Mathf.Clamp01((nearFeature - 1.5f) / 3f);
+            // Suelo llano bajo la caja y sobre la plataforma.
+            weight *= x < LedgeX - 12f ? 1f : (x < LedgeX - 10f ? 1f - SmoothStep(LedgeX - 12f, LedgeX - 10f, x) : (x <= LedgeEndX ? 0f : 1f));
             return h + undulation * weight;
         }
 

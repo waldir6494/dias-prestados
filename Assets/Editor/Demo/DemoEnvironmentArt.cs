@@ -34,6 +34,7 @@ namespace DiasPrestados.Editor.Demo
             Rock("rock_b", 120, 84, 47, true);
             Rock("rock_c", 88, 60, 53, false);
             FallenLog("log_fallen", 176, 32, 61);
+            Crate("crate_wood", 44, 44, 17);
             Fern("fern", 112, 96, 71);
             GrassTuft("grass_tuft", 72, 56, 81);
             Bush("bush", 160, 96, 91);
@@ -363,6 +364,49 @@ namespace DiasPrestados.Editor.Demo
 
             img.OuterOutline(new Color(0.06f, 0.08f, 0.1f, 0.85f));
             img.Save(P(name), 32f, FilterMode.Bilinear, new Vector2(0.5f, 0.08f));
+        }
+
+        /// <summary>Caja de madera vieja: marco oscuro, tablones horizontales y travesaño en diagonal.</summary>
+        static void Crate(string name, int w, int h, int seed)
+        {
+            var img = new DemoImg(w, h);
+            Color wood = new Color(0.50f, 0.36f, 0.24f);
+            Color frame = new Color(0.30f, 0.21f, 0.15f);
+            const int border = 4;
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    bool isFrame = x < border || y < border || x >= w - border || y >= h - border;
+                    float grain = 0.80f + 0.35f * Mathf.PerlinNoise(x * 0.9f + seed, y * 0.12f);
+                    int plank = (y - border) / 8;
+                    bool seam = !isFrame && (y - border) % 8 == 0;
+                    Color c = isFrame ? DemoImg.Mul(frame, grain) : DemoImg.Mul(wood, grain * (0.92f + 0.08f * (plank % 2)));
+                    if (seam)
+                    {
+                        c = DemoImg.Mul(frame, 0.8f);
+                    }
+
+                    // Travesaño diagonal
+                    if (!isFrame && Mathf.Abs((x - border) - (y - border) * (float)(w - 2 * border) / (h - 2 * border)) < 2.5f)
+                    {
+                        c = DemoImg.Mul(frame, 1.15f * grain);
+                    }
+
+                    // Luz suave desde arriba
+                    c = DemoImg.Mul(c, 0.82f + 0.25f * (y / (float)h));
+                    img.Set(x, y, c);
+                }
+            }
+
+            // Clavos
+            Color nail = new Color(0.62f, 0.60f, 0.55f);
+            img.Disc(2f, 2f, 1f, nail);
+            img.Disc(w - 3f, 2f, 1f, nail);
+            img.Disc(2f, h - 3f, 1f, nail);
+            img.Disc(w - 3f, h - 3f, 1f, nail);
+            img.OuterOutline(new Color(0.06f, 0.07f, 0.09f, 0.85f));
+            img.Save(P(name), 32f, FilterMode.Point);
         }
 
         static void FallenLog(string name, int w, int h, int seed)

@@ -85,11 +85,11 @@ namespace DiasPrestados.Editor.Demo
 
         public static void GenerateArt()
         {
+            DemoBrotherPng.ConfigureImporters();
             DemoEnvironmentArt.Generate();
-            DemoBrotherArt.Generate();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("[Días Prestados] Arte del Hito 1 generado en Assets/Art/Demo y Assets/Art/Characters/LittleBrother.");
+            Debug.Log("[Días Prestados] Arte del Hito 1 generado en Assets/Art/Demo (el hermano usa los PNG de LittleBrother_Png).");
         }
 
         // ------------------------------------------------------------------
@@ -463,9 +463,9 @@ namespace DiasPrestados.Editor.Demo
             for (int i = 0; i < rockX.Length; i++)
             {
                 float x = rockX[i];
-                float scale = (i == 7 ? 0.95f : 0.45f + (float)rng.NextDouble() * 0.3f);
+                float scale = (i == 7 ? 0.38f : 0.2f + (float)rng.NextDouble() * 0.16f);
                 Sprite r = i == 7 ? rocks[0] : rocks[rng.Next(0, 3)];
-                var sr = Spr(props, "Rock_Decor", r, new Vector2(x, DemoTerrain.Height(x) - 0.12f), LayerGameplay, 2, Color.white, scale, true);
+                var sr = Spr(props, "Rock_Decor", r, new Vector2(x, DemoTerrain.Height(x) - 0.12f), LayerGameplay, -3, new Color(0.78f, 0.84f, 0.9f, 1f), scale, true);
                 sr.flipX = rng.NextDouble() < 0.5;
             }
 
@@ -595,7 +595,7 @@ namespace DiasPrestados.Editor.Demo
             visual.transform.localPosition = new Vector3(0f, -BrotherHalfHeight, 0f);
             visual.transform.localScale = new Vector3(0.7f, 0.7f, 1f);
             var sr = visual.AddComponent<SpriteRenderer>();
-            sr.sprite = LoadSprite(DemoBrotherArt.FramePath("idle_0"));
+            sr.sprite = LoadSprite(DemoBrotherPng.FramePath("idle_0"));
             sr.sharedMaterial = litMaterial;
             Sort(sr, LayerGameplay, 10);
 
@@ -615,18 +615,18 @@ namespace DiasPrestados.Editor.Demo
             aso.FindProperty("follower").objectReferenceValue = follower;
             aso.FindProperty("spriteRenderer").objectReferenceValue = sr;
             aso.FindProperty("visualScale").floatValue = 0.7f;
-            SetSprites(aso, "idle", "idle_0", "idle_1");
-            SetSprites(aso, "walk", "walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_5");
+            SetSprites(aso, "idle", "idle_0", "idle_0", "idle_0", "idle_1", "idle_1");
+            SetSprites(aso, "walk", "walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_5", "walk_6", "walk_7");
             SetSprites(aso, "jump", "jump");
             SetSprites(aso, "fall", "fall");
             SetSprites(aso, "ask", "ask_0", "ask_1");
-            SetSprites(aso, "cheer", "cheer_0", "cheer_1");
+            SetSprites(aso, "cheer", "cheer_0", "cheer_1", "cheer_2", "cheer_3");
             aso.ApplyModifiedPropertiesWithoutUndo();
 
             var interact = go.AddComponent<CompanionBoostInteractable>();
             var iso = new SerializedObject(interact);
             iso.FindProperty("promptAnchor").objectReferenceValue = anchor.transform;
-            iso.FindProperty("interactionRadius").floatValue = 3.6f;
+            iso.FindProperty("interactionRadius").floatValue = 4.8f;
             iso.ApplyModifiedPropertiesWithoutUndo();
 
             // Destello cálido al recibir ayuda
@@ -644,7 +644,7 @@ namespace DiasPrestados.Editor.Demo
             arr.arraySize = frames.Length;
             for (int i = 0; i < frames.Length; i++)
             {
-                arr.GetArrayElementAtIndex(i).objectReferenceValue = LoadSprite(DemoBrotherArt.FramePath(frames[i]));
+                arr.GetArrayElementAtIndex(i).objectReferenceValue = LoadSprite(DemoBrotherPng.FramePath(frames[i]));
             }
         }
 
@@ -665,6 +665,34 @@ namespace DiasPrestados.Editor.Demo
             zso.FindProperty("size").vector2Value = new Vector2(6f, 3.4f);
             zso.FindProperty("landingPoint").objectReferenceValue = landing.transform;
             zso.ApplyModifiedPropertiesWithoutUndo();
+
+            // Minipuzle: la plataforma alta (3,3 u) no se alcanza saltando; hay que empujar la caja hasta el muro y subirse.
+            Sprite crateSprite = LoadSprite(DemoEnvironmentArt.P("crate_wood"));
+            float crateX = DemoTerrain.LedgeX - 6.5f;
+            var crateSr = Spr(world, "Crate_Pushable", crateSprite, new Vector2(crateX, DemoTerrain.Height(crateX) + 0.70f),
+                LayerGameplay, 6, Color.white, 1f, true);
+            var crateRb = crateSr.gameObject.AddComponent<Rigidbody2D>();
+            crateRb.mass = 2.5f;
+            crateRb.gravityScale = 3f;
+            var crateCol = crateSr.gameObject.AddComponent<BoxCollider2D>();
+            crateCol.size = new Vector2(1.34f, 1.34f);
+            crateCol.sharedMaterial = frictionless;
+            crateSr.gameObject.AddComponent<PushableCrate>();
+
+            // Ayuda al pequeño en la plataforma: se sube a la caja y pide que le impulses.
+            float lzx = DemoTerrain.LedgeX - 2.6f;
+            var lzGo = new GameObject("HelpZone_Ledge");
+            lzGo.transform.SetParent(world, false);
+            lzGo.transform.position = new Vector3(lzx, DemoTerrain.Height(lzx) + 1.4f, 0f);
+            var lLanding = new GameObject("Landing");
+            lLanding.transform.SetParent(lzGo.transform, false);
+            float llx = DemoTerrain.LedgeX + 1.6f;
+            lLanding.transform.position = new Vector3(llx, DemoTerrain.Height(llx), 0f);
+            var lZone = lzGo.AddComponent<CompanionHelpZone>();
+            var lzso = new SerializedObject(lZone);
+            lzso.FindProperty("size").vector2Value = new Vector2(6f, 4f);
+            lzso.FindProperty("landingPoint").objectReferenceValue = lLanding.transform;
+            lzso.ApplyModifiedPropertiesWithoutUndo();
 
             // Mensaje de fin de prueba
             var end = new GameObject("EndMessageZone");

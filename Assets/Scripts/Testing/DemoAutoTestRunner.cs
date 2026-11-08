@@ -14,6 +14,8 @@ namespace DiasPrestados.Testing
     {
         public const string OutputFolder = "Temp/DemoAutotest";
         const float CliffX = 118f;
+        const float LedgeX = 100f;
+        const float LedgeEndX = 112f;
         const float RavineLeft = 82f;
         const float RavineRight = 85.4f;
 
@@ -141,6 +143,39 @@ namespace DiasPrestados.Testing
             ok &= Check(dx > 8f, "El jugador se mueve hacia la derecha");
             yield return Shot("02_caminando");
 
+            // Toques cortos: las piernas deben moverse (estado Walk con fotogramas distintos).
+            SetKeys(false, false, false);
+            yield return new WaitForSeconds(0.6f);
+            Animator pAnim = player.GetComponentInChildren<Animator>();
+            SpriteRenderer pSprite = pAnim != null ? pAnim.GetComponent<SpriteRenderer>() : null;
+            var frames = new System.Collections.Generic.HashSet<Sprite>();
+            bool sawWalk = false;
+            float tapX0 = playerBody.position.x;
+            for (int i = 0; i < 6; i++)
+            {
+                SetKeys(true, false, false);
+                for (int f = 0; f < 5; f++)
+                {
+                    yield return null;
+                    if (pAnim != null && pAnim.GetCurrentAnimatorStateInfo(0).IsName("Walk"))
+                    {
+                        sawWalk = true;
+                    }
+
+                    if (pSprite != null)
+                    {
+                        frames.Add(pSprite.sprite);
+                    }
+                }
+
+                SetKeys(false, false, false);
+                yield return new WaitForSeconds(0.18f);
+            }
+
+            Log($"Toques cortos: avance {playerBody.position.x - tapX0:0.00}u, estado Walk={sawWalk}, fotogramas distintos={frames.Count}");
+            ok &= Check(sawWalk && frames.Count >= 3, "Con toques cortos de D las piernas se animan");
+            yield return new WaitForSeconds(0.4f);
+
             // Salto
             SetKeys(true, false, false);
             yield return new WaitForSeconds(0.1f);
@@ -175,6 +210,8 @@ namespace DiasPrestados.Testing
             float stuckSince = -1f;
             float lastX = playerBody.position.x;
             bool reachedPlateau = false;
+            bool ledgeDone = false;
+            Transform crate = GameObject.Find("Crate_Pushable")?.transform;
             float minBrotherDistAfterRavine = 0f;
 
             while (Time.time < tLimit)
@@ -228,6 +265,43 @@ namespace DiasPrestados.Testing
                     }
 
                     yield return null;
+                    continue;
+                }
+
+                // Minipuzle de la caja: empujarla hasta el muro de la plataforma antes de subirse.
+                if (crate != null && !ledgeDone && px > crate.position.x - 3f && px < LedgeX && playerBody.position.y < 2f
+                    && crate.position.x < LedgeX - 1.1f)
+                {
+                    SetKeys(true, false, false);
+                    yield return null;
+                    continue;
+                }
+
+                // Sobre la plataforma: esperar a que el pequeño pida ayuda y pulsar E.
+                if (!ledgeDone && px > LedgeX + 0.5f && px < LedgeEndX - 1f && playerBody.position.y > 3.5f)
+                {
+                    SetKeys(false, false, false);
+                    float tw = Time.time + 14f;
+                    while (Time.time < tw && !(brother.IsWaitingForHelp && sensor.Current != null))
+                    {
+                        yield return null;
+                    }
+
+                    bool asked = brother.IsWaitingForHelp && sensor.Current != null;
+                    Log($"Plataforma: caja en x={crate.position.x:0.0}; el pequeño pide ayuda={asked}");
+                    if (asked)
+                    {
+                        yield return Shot("09_plataforma_ayuda");
+                        SetKeys(false, false, true);
+                        yield return null;
+                        yield return null;
+                        SetKeys(false, false, false);
+                        yield return new WaitForSeconds(2.2f);
+                    }
+
+                    ok &= Check(asked && brother.transform.position.y > 3.8f, "El pequeño sube a la plataforma tras empujar la caja");
+                    ledgeDone = true;
+                    yield return Shot("10_plataforma_arriba");
                     continue;
                 }
 
