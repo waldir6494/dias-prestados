@@ -37,17 +37,11 @@ namespace DiasPrestados
         [SerializeField] float strideLength = 1.6f;
         [SerializeField] float holdWalkTime = 0.12f;
 
-        [Header("Idle — respiración sutil")]
-        [SerializeField] float idleBreathHz = 0.85f;
-        [SerializeField] float idleBreathAmpY = 0.018f;
-        [SerializeField] float idleBreathAmpScale = 0.014f;
-
         const string WalkState = "Walk";
         const string IdleState = "Idle";
         float phase;
         float holdTimer;
         bool wasWalking;
-        float idleBreathTime;
 
         int speedHash;
         int groundedHash;
@@ -145,7 +139,6 @@ namespace DiasPrestados
                 animator.speed = 0f;
                 animator.Play(WalkState, 0, Mathf.Repeat(phase, 1f));
                 wasWalking = true;
-                idleBreathTime = 0f;
                 if (restPoseCached)
                 {
                     visualRoot.localPosition = restLocalPosition;
@@ -162,20 +155,20 @@ namespace DiasPrestados
                     wasWalking = false;
                 }
 
-                // Respiración / micro-movimientos en Idle (misma idea de vida que el idle del hermano).
+                // El clip Idle alterna dos poses del torso, como el hermano (3 + 2 muestras a 3 fps).
+                // La respiración está en los píxeles superiores: no mover ni escalar piernas/pies.
+                // En el aire se mantiene la pose neutra solo si el estado actual es Idle.
+                if (!grounded && animator.GetCurrentAnimatorStateInfo(0).IsName(IdleState))
+                {
+                    animator.Play(IdleState, 0, 0f);
+                    animator.speed = 0f;
+                }
+
                 if (restPoseCached)
                 {
-                    idleBreathTime += Time.deltaTime;
-                    float breath = Mathf.Sin(idleBreathTime * Mathf.PI * 2f * idleBreathHz);
-                    float secondary = Mathf.Sin(idleBreathTime * Mathf.PI * 2f * idleBreathHz * 0.5f + 0.6f);
                     visualRoot.localRotation = Quaternion.identity;
-                    visualRoot.localPosition = restLocalPosition + new Vector3(
-                        secondary * idleBreathAmpY * 0.25f,
-                        breath * idleBreathAmpY,
-                        0f);
-                    float sy = visualScale * (1f + breath * idleBreathAmpScale);
-                    float sx = visualScale * (1f - breath * idleBreathAmpScale * 0.45f);
-                    visualRoot.localScale = new Vector3(sx, sy, 1f);
+                    visualRoot.localPosition = restLocalPosition;
+                    visualRoot.localScale = new Vector3(visualScale, visualScale, 1f);
                 }
             }
         }
