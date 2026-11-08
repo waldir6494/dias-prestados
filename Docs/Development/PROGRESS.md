@@ -1,5 +1,7 @@
 # Progress — Animaciones del protagonista
 
+> **INFORME HISTÓRICO — 2026-11-08.** Las conclusiones sobre regenerar el set, igualdad byte a byte con el zip e Idle fijo pertenecen a una versión anterior; no se certifican para los PNG actuales. No regenerar ni sustituir los Walk. El estado actual y las validaciones pendientes están en [ProjectStatus](../ProjectStatus.md); los criterios visuales vigentes en [WorldArt](../WorldArt.md). «Unity ausente» al final describe aquella ejecución, no un diagnóstico actual de instalación. No confundir el rechazo antiguo del arte con permiso para reemplazarlo ahora.
+
 ## Veredicto tras Play Mode de David
 
 **Walk no es aceptable como arte final.** La causa principal de “partes cortadas / poca definición / acabado distinto” está en los **PNG originales del zip**, no en pérdida por extracción.

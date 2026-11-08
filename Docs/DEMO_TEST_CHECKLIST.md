@@ -1,5 +1,7 @@
 # Días Prestados — Checklist de pruebas
 
+> **Estado de la auditoría 2026-11-08:** pruebas no ejecutadas en esta tarea documental; sin sesión de Unity accesible. Los resultados anteriores no se certifican para los archivos actuales. Fuente de estado: [ProjectStatus](ProjectStatus.md). Usar este listado en una revisión autorizada; no iniciar otro hito al completarlo automáticamente.
+
 ## Hito 1 (manual)
 
 Abrir: **Tools → Dias Prestados → Demo → Abrir DiasPrestadosDemo** y pulsar Play.
@@ -19,7 +21,15 @@ Controles: A/D o ←/→, ↑ o Espacio para saltar, E para interactuar.
 
 ## Hito 1 (automática)
 
-- [x] Menú **Autotest Hito 1 (Play Mode)** → `Temp/DemoAutotest/report.txt` indica "TODO CORRECTO" (última ejecución).
+- [ ] Reejecutar, cuando corresponda, **Autotest Hito 1 (Play Mode)** y registrar fecha, versión y resultado. Existe un informe histórico "TODO CORRECTO", no revalidado aquí; no se leyó su archivo temporal en esta auditoría.
+
+## Calidad visual de personajes (manual, pendiente)
+
+- [ ] Mayor: curva posterior juvenil y natural en todos los Walk; sin pared vertical, casco, recorte hundido ni rojo incorrecto en nuca. Conservar la bufanda real.
+- [ ] Comparar varios ciclos Idle de ambos personajes en Unity: ritmo y sutileza equivalentes, torso/hombros del mayor localizados, pies/piernas y posición general estables; sin rebotes.
+- [ ] Probar Idle → Walk → Idle: respiración detenida al caminar, sin cambios de escala ni saltos de pose; salto/aterrizaje sin interferencias.
+- [ ] Coherencia de silueta, proporciones, alineación y encuadre entre frames; registrar aprobación visual por separado de compilación/autotest.
+- [ ] Revisar sin modificar al hermano ni retocar sprites protegidos salvo petición específica.
 
 ## Hitos 2–10
 

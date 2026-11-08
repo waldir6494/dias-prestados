@@ -1,5 +1,7 @@
 # Días Prestados — referencias visuales (concept art original)
 
+> **Contexto vigente — 2026-11-08:** antecedentes de YESTERFALL; criterios actuales en [WorldArt](../../WorldArt.md) y escenas reales en [ProjectStatus](../../ProjectStatus.md). La regla inferior sobre ForestOrganicDemo corresponde a aquel trabajo: también existe DiasPrestadosDemo para hitos. Elegir la escena según el encargo sin regenerar ninguna. Estas referencias no autorizan sustituir Walk, pelo ni animaciones actuales.
+
 Este directorio es material de **dirección artística** para el prototipo en Unity 6.6. **No** son sprites listos para usar ni fondos de una sola pieza que deban importarse directamente como nivel jugable.
 
 - 01_moodboard_direccion_visual.png: lenguaje visual general, encuadre, paleta y criterios artísticos.

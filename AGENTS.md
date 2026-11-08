@@ -1,128 +1,43 @@
-# AGENTS.md — Días Prestados
+# AGENTS.md — YESTERFALL
 
-Guía para agentes y desarrolladores que trabajen en este repositorio.
+YESTERFALL (antes Días Prestados): metroidvania 2D para un jugador, con acción, exploración, puzles y misterio emocional. PC/Windows y Steam como objetivo inicial. Unity `6000.6.8f1`, URP 2D. Conservar nombres técnicos y namespace `DiasPrestados`; no renombrarlos por iniciativa propia.
 
-## Qué es el proyecto
+## Consultar según la tarea
 
-**Días Prestados** es un juego indie cinematográfico 2D de desplazamiento lateral. Dos hermanos quedan separados por un fenómeno temporal. El tono combina misterio, puzles, sigilo y narrativa visual **sin diálogos**.
+| Tema | Referencia |
+|---|---|
+| Estado real, evidencias y validación pendiente | [ProjectStatus](Docs/ProjectStatus.md) |
+| Identidad, pilares, bucle y calidad | [GameDesign](Docs/GameDesign.md) |
+| Historia e introducción | [Story](Docs/Story.md) |
+| Armas, enemigos y jefes | [Combat](Docs/Combat.md) |
+| Habilidades y progresión | [Skills](Docs/Skills.md) |
+| Puzles y artefacto temporal | [Puzzles](Docs/Puzzles.md) |
+| Mundo, arte, sprites e Idle | [WorldArt](Docs/WorldArt.md) |
+| Menús, objetivos y accesibilidad | [UI](Docs/UI.md) |
+| Música, efectos y licencias | [AudioDesign](Docs/AudioDesign.md) |
+| Guardado y reaparición | [SaveSystem](Docs/SaveSystem.md) |
+| Hitos y autorización | [Roadmap](Docs/Roadmap.md) |
 
-- Motor: **Unity 6.6** (`6000.6.8f1`)
-- Plantilla: **Universal 2D (URP)**
-- Plataforma objetivo actual: **Windows**
-- Idioma de código y comentarios de diseño: **C# / español** cuando aporte claridad
+Leer solo lo relevante. ProjectStatus define DECIDIDO, PROPUESTO, PENDIENTE, IMPLEMENTADO y NO VERIFICADO. Presencia de código no equivale a aprobación jugable o visual.
 
-## Escena de la demo (Hito 1+)
+## Reglas permanentes
 
-**`Assets/Scenes/DiasPrestadosDemo.unity`** — escena independiente de la demo controlada por hitos (ver `Docs/DEMO_MASTER_PLAN.md`, `DEMO_PROGRESS.md`, `DEMO_DECISIONS.md`).
+- Conservar lo existente; cambios pequeños y verificables. Sin reescrituras ni refactorizaciones ajenas al encargo. Calidad y reutilización antes que cantidad.
+- No avanzar al Hito 2 ni a otro hito sin aprobación explícita. Documentar requisitos no autoriza implementar sistemas completos.
+- No modificar proporciones, escalas, sprites ni animaciones que funcionan sin autorización. Walk y pelo del protagonista protegidos: no retocarlos sin petición específica. El hermano es la referencia principal para Idle; no modificarlo al ajustar al mayor.
+- Respetar escenas, prefabs, referencias y `.meta`. No mover ni borrar assets sin comprobar referencias. No crear escenas por feature ni regenerar escenas existentes sin autorización específica.
+- Existen `Assets/Scenes/DiasPrestadosDemo.unity` (demo por hitos) y `ForestOrganicDemo.unity` (escena anterior y única habilitada en Build al auditar). Elegir según el encargo; no cambiar Build Settings ni migrar funcionalidades automáticamente.
+- Antes de cambios fuertes, copia manual fuera del repo. Sin commits, push ni merges salvo petición explícita. No limpiar trabajo ajeno con operaciones destructivas.
+- Runtime en `Assets/Scripts`, editor en `Assets/Editor`; C# y español cuando aporte claridad. Solo Input System moderno (`Assets/Input/PrototypeControls.inputactions`); nunca entrada legacy.
+- Física Unity 6: `linearVelocity`, `linearDamping`, rotación congelada, detección continua e interpolación. Conservar OverlapBox, coyote time y jump buffer. Decoración sin colliders que interfieran con el jugador.
+- Mantener URP 2D en `Assets/Settings`, Light2D y datos URP de cámara; sorting layers Background/Midground/Gameplay/Foreground.
+- No añadir paquetes, descargas ni recursos de pago sin autorización. Comprobar licencias comerciales antes de integrar assets.
+- No afirmar compilación, Play Mode, calidad visual ni aceptación sin evidencia. Registrar fecha, alcance y límites de cada comprobación.
+- Al implementar, actualizar ProjectStatus; al cambiar diseño, su documento. Separar ideas, requisitos y resultados verificados. Evitar duplicación y conservar un historial breve de decisiones sustituidas.
+- Evitar subagentes, búsquedas repetidas y tareas innecesarias. No escanear Library/Temp/Logs/obj/Builds. Para documentación no compilar, regenerar ni ejecutar pruebas de gameplay.
 
-- Abrir: **Tools → Dias Prestados → Demo → Abrir DiasPrestadosDemo**. Controles: A/D o ←/→, ↑/Espacio salto, E interactuar.
-- Se construye con **Demo → Construir escena Hito 1** (sobrescribe solo esta escena) y **Generar arte del Hito 1**; autotest en **Demo → Autotest Hito 1 (Play Mode)**.
-- Código: `Scripts/Companions`, `Scripts/Interaction`, `Scripts/UI`, `Scripts/Testing`; editor: `Assets/Editor/Demo`.
-- No avanzar de hito sin aprobación explícita del usuario.
+## Demo y antecedentes
 
-## Escena principal anterior (ForestOrganicDemo)
+Abrir demo: **Tools → Dias Prestados → Demo → Abrir DiasPrestadosDemo**. Controles configurados: A/D o flechas, ↑/Espacio y E. Abrir Forest: **Tools → Dias Prestados → Abrir Forest Organic Demo** (solo abre). Hay menús de ruta Forest Organic, colliders y autotest Hito 1; su existencia no acredita una ejecución reciente.
 
-**`Assets/Scenes/ForestOrganicDemo.unity`**
-
-- Es la **única** escena de desarrollo y la escena inicial de Build (Windows).
-- Integrar nuevas funcionalidades **sobre esta escena**. No crear demos nuevas por feature.
-- Controles: **A/D** o ←/→; salto: **↑** (`Assets/Input/PrototypeControls.inputactions`).
-- Abrir: Project → `Assets/Scenes/ForestOrganicDemo`, o **Tools → Dias Prestados → Abrir Forest Organic Demo** (solo abre; **nunca** regenera).
-- Si falta el archivo: error claro; no hay bootstrap desde escenas antiguas (ya eliminadas).
-- Geometría de referencia del tramo: `Assets/Editor/ForestOrganicLayout.cs`.
-- Comprobación geométrica (Edit Mode): **Tools → Dias Prestados → Comprobar ruta Forest Organic**.
-- Colliders en Scene View: **Tools → Dias Prestados → Mostrar colliders del escenario**.
-
-## Estado actual
-
-- Controlador: `PlayerController2D` + Input System
-- Cámara: `CameraFollow2D`
-- Atmósfera "Memoria desvanecida", terreno orgánico, parallax, niebla, luces URP 2D
-- Arte provisional en `Assets/Art` (`ForestOrganic/`, `ForestAtmosphere/`, etc.)
-- **Aún no** hay puzles temporales, enemigos ni sistemas narrativos avanzados
-
-## Estructura relevante
-
-```
-Assets/
-  Art/
-    Prototype/            # Sprites compartidos (p. ej. jugador)
-    Forest/               # Capas / siluetas de bosque (legado, en uso visual)
-    ForestAtmosphere/     # Capas / paleta / motas usadas por la escena principal
-    ForestOrganic/        # Terreno, tronco, peñasco, pasarela…
-  Editor/                 # Herramientas (abrir escena, colliders, checks)
-  Input/                  # PrototypeControls.inputactions
-  Scripts/
-    Camera/
-    Environment/          # ParallaxLayer, AmbientDustParticles, AtmosphereVignette
-    Player/
-  Scenes/
-    ForestOrganicDemo.unity   # ÚNICA escena
-  Settings/               # URP / Input System
-```
-
-## Limitaciones artísticas (provisional)
-
-- Sprites generados por código (siluetas de baja resolución, sin animación).
-- No son arte final: sirven para tono, composición, parallax e iluminación.
-- Sustituibles más adelante por assets de producción manteniendo sorting layers / factores de parallax.
-
-## Convenciones técnicas
-
-### Unity 6 / física 2D
-
-- Usar `Rigidbody2D.linearVelocity` (no `velocity`).
-- Preferir APIs Unity 6 renombradas (`linearDamping`, etc.) cuando existan.
-- Personajes dinámicos: `FreezeRotation`, `CollisionDetectionMode2D.Continuous`, interpolación activada.
-- Detección de suelo fiable (OverlapBox + coyote time + jump buffer).
-- Decoración/fondos: **sin Collider2D** que interfiera con el jugador.
-
-### Input
-
-- **Solo** Input System moderno (`com.unity.inputsystem`).
-- No usar `Input.GetAxis` / `Input.GetKey` legacy.
-- Acciones: `Assets/Input/PrototypeControls.inputactions`.
-
-### Render / URP 2D
-
-- Mantener configuración URP 2D en `Assets/Settings/`.
-- Escena 2D: `Light2D` global + cámara con `UniversalAdditionalCameraData`.
-
-### Organización de código
-
-- Runtime: `Assets/Scripts/...`
-- Editor: `Assets/Editor/...`
-- Namespace: `DiasPrestados` / `DiasPrestados.Editor`
-- No dependencias de pago ni paquetes innecesarios.
-- No commits/pushes/merges salvo petición explícita del usuario.
-
-### Escenas
-
-- Solo `ForestOrganicDemo.unity` en `Assets/Scenes`.
-- **Nunca** regenerar ni sobrescribir la escena principal con generadores.
-- Menús históricos de Prototype / ForestDemo / ForestAtmosphere están desactivados.
-- Antes de cambios fuertes: backup manual fuera del repo o commit local (no hay carpeta `Scenes/Backups`).
-
-## Prioridades de diseño (producto)
-
-1. Base jugable estable ← (ForestOrganicDemo)
-2. Narrativa visual y atmósfera
-3. Puzles temporales
-4. Sigilo y tensión
-5. Pulido de arte y audio
-
-## Qué evitar
-
-- Afirmar compilación/Play Mode sin verificarlo.
-- Commits no pedidos.
-- Sustituir Input System por legacy.
-- Crear escenas nuevas por cada feature.
-- Descargas externas / assets de pago no solicitados.
-
-## Pruebas mínimas
-
-- Abrir `Assets/Scenes/ForestOrganicDemo.unity` (sin Missing Scripts).
-- Play: moverse, saltar (↑), recorrer loma → tronco → peñasco → pasarela.
-- Parallax, niebla, luces y motas intactos; decoración sin empujar al jugador.
-- File → Build Settings: solo `ForestOrganicDemo` habilitada.
-- Depuración: **Tools → Dias Prestados → Mostrar colliders del escenario**.
+[DEMO_MASTER_PLAN](Docs/DEMO_MASTER_PLAN.md), [DEMO_DECISIONS](Docs/DEMO_DECISIONS.md), [DEMO_PROGRESS](Docs/DEMO_PROGRESS.md), [DEMO_TEST_CHECKLIST](Docs/DEMO_TEST_CHECKLIST.md) y `Docs/Development/` conservan antecedentes. Las actualizaciones fechadas de los documentos maestros prevalecen sobre instrucciones antiguas incompatibles. Las referencias visuales son concept art, no sprites finales ni autorización para reemplazarlos.

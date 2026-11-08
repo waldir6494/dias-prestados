@@ -1,5 +1,7 @@
 # DÍAS PRESTADOS — GUÍA DE REFERENCIAS VISUALES
 
+> **Contexto vigente — 2026-11-08:** concept art histórico de YESTERFALL. Consultar [WorldArt](../WorldArt.md), [Story](../Story.md) y [Roadmap](../Roadmap.md) antes de interpretar estas láminas. Los tiempos A–E son orientativos del plan antiguo; no sustituyen la separación actual a los 60–90 s ni el diseño metroidvania. Las propuestas procedurales/por piezas no autorizan reemplazar los personajes PNG existentes. Textos breves sí están permitidos; sin voces/doblaje.
+
 Este directorio contiene ilustraciones generadas como **referencias de dirección artística**, no sprites ni prefabs listos para producción. Las láminas fueron recortadas de concept boards; pueden incluir flechas y anotaciones gráficas. Las proporciones y el encuadre deben reinterpretarse para un juego 2D de cámara lateral.
 
 ## PRIORIDAD VISUAL

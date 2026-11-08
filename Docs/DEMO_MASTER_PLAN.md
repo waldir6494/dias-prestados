@@ -1,14 +1,16 @@
 # Días Prestados — Plan maestro de la demo (≈10 min)
 
+> **Antecedente histórico, revisado el 2026-11-08.** El diseño vigente es YESTERFALL: consultar [GameDesign](GameDesign.md), [Roadmap](Roadmap.md) y [ProjectStatus](ProjectStatus.md). Se conserva el plan 0–10 como referencia; no autoriza iniciar el Hito 2. Antes de ejecutarlo hay que reconciliar combate/progresión, textos breves y separación de los hermanos a los 60–90 s. Las instrucciones antiguas incompatibles quedan sustituidas por los documentos actuales.
+
 Plan por hitos con parada obligatoria tras cada uno. Ningún hito empieza sin aprobación explícita del usuario.
 
 ## Principios
 
-- Motor Unity 6.6 (`6000.6.8f1`), URP 2D, solo Input System moderno, sin diálogos.
+- Motor Unity 6.6 (`6000.6.8f1`), URP 2D, solo Input System moderno; sin voces/doblaje, con textos breves según el diseño vigente.
 - Referencias visuales en `Docs/VisualReferences/` (concept art, no sprites). Paleta: azul pizarra, verde grisáceo, ámbar cálido. Violeta **solo** para anomalías temporales.
 - Hermano mayor (12): pelo castaño oscuro desordenado, ropa azul/gris, bufanda roja/ladrillo, mochila marrón. Hermano pequeño (8): pelo castaño, gorro de lana con pompón, chaqueta mostaza, mochila pequeña.
 - Escena de la demo: `Assets/Scenes/DiasPrestadosDemo.unity` (independiente de `ForestOrganicDemo`).
-- Arte provisional generado por código desde `Assets/Editor/Demo/*`, sustituible por arte final.
+- Entorno provisional con generación desde `Assets/Editor/Demo/*`; personajes actuales basados en PNG. Su posible sustitución futura requiere autorización específica; no regenerar los Walk ni retocar la cabeza por iniciativa propia.
 
 ## Arquitectura (resumen)
 
@@ -20,7 +22,7 @@ Plan por hitos con parada obligatoria tras cada uno. Ningún hito empieza sin ap
 | Entorno | `Scripts/Environment` | Parallax, motas, viñeta, brillo de alegría |
 | UI | `Scripts/UI` | HUD de controles, mensajes por zona |
 | Pruebas | `Scripts/Testing`, `Editor/Demo` | Autotest en Play Mode con teclado virtual |
-| Construcción de escena | `Editor/Demo` | `DemoTerrain` (perfil único), `DemoImg`, `DemoBrotherArt`, `DemoEnvironmentArt`, `DemoSceneBuilder` |
+| Construcción de escena | `Editor/Demo` | `DemoTerrain`, `DemoImg`, `DemoBrotherPng`, `DemoEnvironmentArt`, `DemoSceneBuilder`; no ejecutar generadores para documentar |
 
 Arquitectura prevista para hitos posteriores:
 
