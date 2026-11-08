@@ -1,109 +1,43 @@
-# AGENTS.md — Días Prestados
+# AGENTS.md — YESTERFALL
 
-Guía para agentes y desarrolladores que trabajen en este repositorio.
+YESTERFALL (antes Días Prestados): metroidvania 2D para un jugador, con acción, exploración, puzles y misterio emocional. PC/Windows y Steam como objetivo inicial. Unity `6000.6.8f1`, URP 2D. Conservar nombres técnicos y namespace `DiasPrestados`; no renombrarlos por iniciativa propia.
 
-## Qué es el proyecto
+## Consultar según la tarea
 
-**Días Prestados** es un juego indie cinematográfico 2D de desplazamiento lateral. Dos hermanos quedan separados por un fenómeno temporal. El tono combina misterio, puzles, sigilo y narrativa visual **sin diálogos**.
+| Tema | Referencia |
+|---|---|
+| Estado real, evidencias y validación pendiente | [ProjectStatus](Docs/ProjectStatus.md) |
+| Identidad, pilares, bucle y calidad | [GameDesign](Docs/GameDesign.md) |
+| Historia e introducción | [Story](Docs/Story.md) |
+| Armas, enemigos y jefes | [Combat](Docs/Combat.md) |
+| Habilidades y progresión | [Skills](Docs/Skills.md) |
+| Puzles y artefacto temporal | [Puzzles](Docs/Puzzles.md) |
+| Mundo, arte, sprites e Idle | [WorldArt](Docs/WorldArt.md) |
+| Menús, objetivos y accesibilidad | [UI](Docs/UI.md) |
+| Música, efectos y licencias | [AudioDesign](Docs/AudioDesign.md) |
+| Guardado y reaparición | [SaveSystem](Docs/SaveSystem.md) |
+| Hitos y autorización | [Roadmap](Docs/Roadmap.md) |
 
-- Motor: **Unity 6.6** (`6000.6.8f1`)
-- Plantilla: **Universal 2D (URP)**
-- Plataforma objetivo actual: **Windows**
-- Idioma de código y comentarios de diseño: **C# / español** cuando aporte claridad
+Leer solo lo relevante. ProjectStatus define DECIDIDO, PROPUESTO, PENDIENTE, IMPLEMENTADO y NO VERIFICADO. Presencia de código no equivale a aprobación jugable o visual.
 
-## Estado actual
+## Reglas permanentes
 
-Base jugable de prototipo:
+- Conservar lo existente; cambios pequeños y verificables. Sin reescrituras ni refactorizaciones ajenas al encargo. Calidad y reutilización antes que cantidad.
+- No avanzar al Hito 2 ni a otro hito sin aprobación explícita. Documentar requisitos no autoriza implementar sistemas completos.
+- No modificar proporciones, escalas, sprites ni animaciones que funcionan sin autorización. Walk y pelo del protagonista protegidos: no retocarlos sin petición específica. El hermano es la referencia principal para Idle; no modificarlo al ajustar al mayor.
+- Respetar escenas, prefabs, referencias y `.meta`. No mover ni borrar assets sin comprobar referencias. No crear escenas por feature ni regenerar escenas existentes sin autorización específica.
+- Existen `Assets/Scenes/DiasPrestadosDemo.unity` (demo por hitos) y `ForestOrganicDemo.unity` (escena anterior y única habilitada en Build al auditar). Elegir según el encargo; no cambiar Build Settings ni migrar funcionalidades automáticamente.
+- Antes de cambios fuertes, copia manual fuera del repo. Sin commits, push ni merges salvo petición explícita. No limpiar trabajo ajeno con operaciones destructivas.
+- Runtime en `Assets/Scripts`, editor en `Assets/Editor`; C# y español cuando aporte claridad. Solo Input System moderno (`Assets/Input/PrototypeControls.inputactions`); nunca entrada legacy.
+- Física Unity 6: `linearVelocity`, `linearDamping`, rotación congelada, detección continua e interpolación. Conservar OverlapBox, coyote time y jump buffer. Decoración sin colliders que interfieran con el jugador.
+- Mantener URP 2D en `Assets/Settings`, Light2D y datos URP de cámara; sorting layers Background/Midground/Gameplay/Foreground.
+- No añadir paquetes, descargas ni recursos de pago sin autorización. Comprobar licencias comerciales antes de integrar assets.
+- No afirmar compilación, Play Mode, calidad visual ni aceptación sin evidencia. Registrar fecha, alcance y límites de cada comprobación.
+- Al implementar, actualizar ProjectStatus; al cambiar diseño, su documento. Separar ideas, requisitos y resultados verificados. Evitar duplicación y conservar un historial breve de decisiones sustituidas.
+- Evitar subagentes, búsquedas repetidas y tareas innecesarias. No escanear Library/Temp/Logs/obj/Builds. Para documentación no compilar, regenerar ni ejecutar pruebas de gameplay.
 
-- Controlador 2D con Input System
-- Escena generable `Assets/Scenes/Prototype.unity`
-- Arte provisional procedural (sprites PNG persistentes)
-- **Aún no** hay puzles temporales, enemigos ni sistemas narrativos avanzados
+## Demo y antecedentes
 
-## Cómo generar el prototipo
+Abrir demo: **Tools → Dias Prestados → Demo → Abrir DiasPrestadosDemo**. Controles configurados: A/D o flechas, ↑/Espacio y E. Abrir Forest: **Tools → Dias Prestados → Abrir Forest Organic Demo** (solo abre). Hay menús de ruta Forest Organic, colliders y autotest Hito 1; su existencia no acredita una ejecución reciente.
 
-1. Abrir el proyecto en Unity 6.6.
-2. Menú: **Tools → Dias Prestados → Crear prototipo**.
-3. Si `Prototype.unity` ya existe, confirmar el reemplazo (`SampleScene` no se toca).
-4. Abrir `Assets/Scenes/Prototype.unity` (el generador la deja abierta/seleccionada).
-5. Pulsar **Play**.
-6. Controles: **A/D** o **flechas** para mover, **Espacio** para saltar.
-
-## Estructura relevante
-
-```
-Assets/
-  Art/Prototype/          # Sprites generados (persistentes)
-  Editor/                 # Herramientas de editor (solo Editor)
-  Input/                  # Input Actions del prototipo
-  Scripts/
-    Camera/               # Seguimiento de cámara
-    Player/               # Controlador del personaje
-  Scenes/
-    Prototype.unity       # Escena jugable generada
-    SampleScene.unity     # Escena plantilla — no sobrescribir
-  Settings/               # URP / Input System plantilla
-```
-
-## Convenciones técnicas
-
-### Unity 6 / física 2D
-
-- Usar `Rigidbody2D.linearVelocity` (no `velocity`).
-- Preferir APIs Unity 6 renombradas (`linearDamping`, etc.) cuando existan.
-- Personajes dinámicos: `FreezeRotation`, `CollisionDetectionMode2D.Continuous`, interpolación activada.
-- Detección de suelo fiable (OverlapBox + coyote time + jump buffer).
-
-### Input
-
-- **Solo** Input System moderno (`com.unity.inputsystem`).
-- No usar `Input.GetAxis` / `Input.GetKey` legacy.
-- Acciones del prototipo: `Assets/Input/PrototypeControls.inputactions`.
-- El proyecto usa `activeInputHandler: Input System Package` (sin legacy).
-
-### Render / URP 2D
-
-- Mantener configuración URP 2D existente en `Assets/Settings/`.
-- Escenas 2D deben incluir `Light2D` global y cámara con `UniversalAdditionalCameraData`.
-- No romper ni sustituir el pipeline sin necesidad explícita.
-
-### Organización de código
-
-- Runtime: `Assets/Scripts/...`
-- Editor: `Assets/Editor/...`
-- Namespace raíz: `DiasPrestados` (editor: `DiasPrestados.Editor`)
-- No añadir dependencias de pago ni paquetes innecesarios.
-- No modificar archivos ajenos al objetivo de la tarea.
-- Conservar `.meta` existentes; dejar que Unity genere los de archivos nuevos.
-
-### Escenas y contenido generado
-
-- **Nunca** sobrescribir `SampleScene.unity` como parte de herramientas internas.
-- Si un generador puede reemplazar `Prototype.unity`, pedir confirmación.
-- Los assets creados por herramientas deben persistir en disco (`AssetDatabase`, PNG, escenas guardadas con `EditorSceneManager`).
-
-## Prioridades de diseño (producto)
-
-1. Base jugable estable (movimiento, cámara, escenario).
-2. Narrativa visual y atmósfera.
-3. Puzles temporales / mecánica de “días prestados”.
-4. Sigilo y tensión.
-5. Pulido de arte y audio.
-
-No implementar sistemas futuros (puzles temporales, enemigos, UI narrativa completa) hasta que la base pedida esté sólida.
-
-## Qué evitar
-
-- Afirmar que Unity compiló o que Play Mode funciona sin haberlo verificado.
-- Commits no pedidos por el usuario.
-- Refactors amplios no solicitados.
-- Sustituir Input System por Input legacy.
-- Introducir assets externos de pago o SDKs no solicitados.
-
-## Pruebas mínimas recomendadas tras cambios de prototipo
-
-- Menú de generación ejecuta sin errores en Console.
-- Escena guarda en `Assets/Scenes/Prototype.unity`.
-- Play Mode: correr, saltar a las 4 plataformas, subir el desnivel, superar obstáculos.
-- Cámara sigue al jugador y respeta límites horizontales.
-- Cerrar/reabrir Unity: sprites y escena siguen presentes.
+[DEMO_MASTER_PLAN](Docs/DEMO_MASTER_PLAN.md), [DEMO_DECISIONS](Docs/DEMO_DECISIONS.md), [DEMO_PROGRESS](Docs/DEMO_PROGRESS.md), [DEMO_TEST_CHECKLIST](Docs/DEMO_TEST_CHECKLIST.md) y `Docs/Development/` conservan antecedentes. Las actualizaciones fechadas de los documentos maestros prevalecen sobre instrucciones antiguas incompatibles. Las referencias visuales son concept art, no sprites finales ni autorización para reemplazarlos.
