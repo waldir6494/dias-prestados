@@ -20,7 +20,15 @@ Los hitos 0–10 se conservan en [DEMO_MASTER_PLAN](DEMO_MASTER_PLAN.md). [DEMO_
 | Hito 1: primera prueba jugable | Código, recursos y escena presentes; comportamiento y aceptación visual pendientes de comprobación actual. |
 | Hitos 2–10 | PENDIENTES, sin iniciar por esta tarea. El plan anterior requiere ajuste al metroidvania antes de su ejecución. |
 
-El Hito 2 antiguo prolongaba la relación a ~2 minutos y la separación llegaba en Hito 3. El objetivo narrativo actual es separarlos tras ~60–90 segundos. No resolver esta diferencia construyendo tramos: acordar primero el alcance.
+| Hito | Nombre | Alcance y Aceptación |
+|---|---|---|
+| Hito 0 | Auditoría y plan | Documentación actualizada con la nueva historia del cerrajero. |
+| Hito 1 | El Bosque y la Niebla | Mecánicas base: Movimiento, salto, puzle de caja, compañero. Narrativa: Caminata, niebla, murmullos, el candado brilla, destello y desaparición. Termina al llegar al borde del pueblo vacío. Sin combate. |
+| Hito 2 | El Pueblo y el Candado | Introducción del sistema `TemporalObject`. El jugador usa el candado para envejecer el entorno por primera vez. |
+| Hito 3 | Primer Encuentro Hostil | Introducción aislada de la pistola 1911 y el combate básico contra las ratas/avispas extrañas. |
+| Hitos 4-6 | Puzles y Progresión | Combinación de disparos (rebotes/perforación) con manipulación temporal para avanzar por el pueblo. |
+| Hito 7 | El Creador del Bucle | Combate contra el jefe temporal que envió al hermano al pasado. |
+| Hito 8 | El Abrazo Final | Revelación de la silueta con chaqueta mostaza (el abuelo cerrajero). Cinemática in-engine del abrazo. Cierre con música triste. |
 
 ## PROPUESTO — secuencia para acordar, no autorización
 
