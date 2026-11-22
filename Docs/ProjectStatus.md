@@ -36,6 +36,7 @@ YESTERFALL es la identidad de producto actual; nombres técnicos `DiasPrestados`
 | Recuperación | `PlayerFallRecovery.cs`: posición segura en memoria; caja con restitución al origen. | No son guardado persistente ni sistema completo de muerte. |
 | UI provisional | `DemoHudOverlay.cs`, `DemoMessageZone.cs`, componentes en demo. | Controles/mensaje por X; no sistema completo de objetivos. |
 | Herramientas | Menús de abrir escenas, ruta Forest, colliders y autotest Hito 1; `Assets/Scripts/Testing/DemoAutoTestRunner.cs`. | Existencia de herramientas no es ejecución reciente. |
+| Cabra Chronoram | `CabraWalker.cs`, `CabraSpriteSet.cs`, `CabraChronoram.asset` y objeto `Cabra` en `DiasPrestadosDemo.unity`. Fotogramas de `walking`, `turn head` y `turn around`. | 2026-11-21: cuernos a la altura del hombro del hermano mayor (escala 0,48; paso ~666 px/u, `turn head` ~662, `turn around` ~792). En el giro el pivote sujeta el torso, no el casco: antes el cuerpo se iba hasta 0,36 u y un píxel suelto de `turn head` 0004 lo sacaba medio cuerpo. Collider 0,91 × 0,55. Sin fotogramas interpolados. No probado en Play Mode. |
 
 Sorting layers comprobadas en `ProjectSettings/TagManager.asset`: Background, Midground, Gameplay y Foreground (además de Default).
 
@@ -73,5 +74,6 @@ Revisión manual autorizada en `DiasPrestadosDemo.unity`: ambos personajes quiet
 
 ## Historial breve y mantenimiento
 
+- 2026-11-21: cabra al hombro del hermano mayor. El giro ya no persigue el casco: el torso se queda quieto. Sin Play Mode.
 - 2026-11-08: documentación maestra YESTERFALL, separación de diseño/evidencia y retirada de instrucciones históricas incompatibles. Hito 1 sigue pendiente de revisión; Hito 2 no iniciado por esta tarea.
 - Al cambiar una función, actualizar su fila con archivos y pruebas concretas. Al cambiar una decisión, actualizar el documento de diseño y una nota breve de sustitución. No convertir propuestas ni informes antiguos en verificaciones actuales.
